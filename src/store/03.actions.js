@@ -38,9 +38,9 @@ const fetchLabels = ({ state, commit }) =>
   });
 
 const syncSummary = ({ state, commit }) => {
-  state.refs.summary = db.ref(`/dict/${state.theDomain}/summary`);
-  state.refs.summary.on('value', snap => {
-    commit('SUMMARY', snap.val());
+  const ref = db.ref(`/dict/${state.theDomain}/summary`);
+  ref.on('value', snap => {
+    commit('SUMMARY', { snap: snap.val(), ref });
   });
 };
 const fetchWorksetStates = ({ state, commit }) =>

@@ -12,8 +12,9 @@ const LABELS = (state, payload) => {
   state.labels = payload;
 };
 
-const SUMMARY = (state, payload) => {
-  state.summary = payload;
+const SUMMARY = (state, { snap, ref }) => {
+  state.refs.summary = ref;
+  state.summary = snap;
 };
 const WORKSET_STATES = (state, payload) => {
   state.worksetStates = payload;
