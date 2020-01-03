@@ -8,8 +8,8 @@ import * as actions from './03.actions';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-	state,
-	getters,
-	mutations,
-	actions,
+  state,
+  getters,
+  mutations,
+  actions,
 });
