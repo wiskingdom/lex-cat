@@ -4,7 +4,9 @@ export default {
   theDomain: '',
   users: {},
   theUserId: '',
-
+  refs: {
+    summary: {},
+  },
   // entrywork
   labels: {
     pos: {},

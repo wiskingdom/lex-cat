@@ -3,9 +3,49 @@ import fireapp from '@/fireapp';
 const db = fireapp.database();
 // const auth = fireapp.auth();
 
-const fetchDomainNames = ({ getters, commit }) =>
+const fetchDomainNames = ({ commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref('/app/domainNames')
+      .once('value')
+      .then(snap => {
+        commit('DOMAIN_NAMES', snap.val());
+        resolve();
+      });
+  });
+
+const pickTheDomain = ({ commit }, domainName) => {
+  commit('THE_DOC_FOLDER', domainName);
+};
+
+const fetchUsers = ({ commit }) =>
+  new Promise(resolve => {
+    db.ref('/app/users')
+      .once('value')
+      .then(snap => {
+        commit('USERS', snap.val());
+        resolve();
+      });
+  });
+
+const fetchLabels = ({ state, commit }) =>
+  new Promise(resolve => {
+    db.ref(`/app/labels/${state.theDomain}`)
+      .once('value')
+      .then(snap => {
+        commit('LABELS', snap.val());
+        resolve();
+      });
+  });
+
+const syncSummary = ({ state, commit }) => {
+  state.refs.summary = db.ref(`/dict/${state.theDomain}/summary`);
+  state.refs.summary.on('value', snap => {
+    commit('SUMMARY', snap.val());
+  });
+};
+const fetchWorksetStates = ({ state, commit }) =>
+  new Promise(resolve => {
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -13,9 +53,9 @@ const fetchDomainNames = ({ getters, commit }) =>
       });
   });
 
-const pickTheDomain = ({ getters, commit }) =>
+const pickTheWorksetId = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -23,9 +63,9 @@ const pickTheDomain = ({ getters, commit }) =>
       });
   });
 
-const fetchUsers = ({ getters, commit }) =>
+const fetchEntryStates = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -33,9 +73,9 @@ const fetchUsers = ({ getters, commit }) =>
       });
   });
 
-const fetchLabels = ({ getters, commit }) =>
+const pickTheEntryId = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -43,9 +83,9 @@ const fetchLabels = ({ getters, commit }) =>
       });
   });
 
-const fetchSummary = ({ getters, commit }) =>
+const fetchSuperEntry = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -53,9 +93,9 @@ const fetchSummary = ({ getters, commit }) =>
       });
   });
 
-const fetchWorksetStates = ({ getters, commit }) =>
+const fetchSimilars = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -63,9 +103,9 @@ const fetchWorksetStates = ({ getters, commit }) =>
       });
   });
 
-const pickTheWorksetId = ({ getters, commit }) =>
+const fetchSearchedSimilars = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -73,9 +113,9 @@ const pickTheWorksetId = ({ getters, commit }) =>
       });
   });
 
-const fetchEntryStates = ({ getters, commit }) =>
+const fetchEntry = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -83,9 +123,9 @@ const fetchEntryStates = ({ getters, commit }) =>
       });
   });
 
-const pickTheEntryId = ({ getters, commit }) =>
+const fetchSynset = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -93,59 +133,9 @@ const pickTheEntryId = ({ getters, commit }) =>
       });
   });
 
-const fetchSuperEntry = ({ getters, commit }) =>
+const fetchIssue = ({ state, commit }) =>
   new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
-      .once('value')
-      .then(snap => {
-        commit('ENTRY_STATES', snap.val());
-        resolve();
-      });
-  });
-
-const fetchSimilars = ({ getters, commit }) =>
-  new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
-      .once('value')
-      .then(snap => {
-        commit('ENTRY_STATES', snap.val());
-        resolve();
-      });
-  });
-
-const fetchSearchedSimilars = ({ getters, commit }) =>
-  new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
-      .once('value')
-      .then(snap => {
-        commit('ENTRY_STATES', snap.val());
-        resolve();
-      });
-  });
-
-const fetchEntry = ({ getters, commit }) =>
-  new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
-      .once('value')
-      .then(snap => {
-        commit('ENTRY_STATES', snap.val());
-        resolve();
-      });
-  });
-
-const fetchSynset = ({ getters, commit }) =>
-  new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
-      .once('value')
-      .then(snap => {
-        commit('ENTRY_STATES', snap.val());
-        resolve();
-      });
-  });
-
-const fetchIssue = ({ getters, commit }) =>
-  new Promise(resolve => {
-    db.ref(`/dict/${getters.theDomain}/entryStates`)
+    db.ref(`/dict/${state.theDomain}/entryStates`)
       .once('value')
       .then(snap => {
         commit('ENTRY_STATES', snap.val());
@@ -158,7 +148,7 @@ export {
   pickTheDomain,
   fetchUsers,
   fetchLabels,
-  fetchSummary,
+  syncSummary,
   fetchWorksetStates,
   pickTheWorksetId,
   fetchEntryStates,
