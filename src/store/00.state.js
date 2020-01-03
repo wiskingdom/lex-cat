@@ -1,15 +1,13 @@
 export default {
-	// for meta
-
-	// for main layout
-	theUserId: '',
+	domainNames: {},
 	theDomainId: '',
-
-	// for entry work layout
-	entryWork: {
-		theWorksetId: '',
-		worksets: [],
-		theEntryId: '',
-		entryStates: {},
-	},
+	theUserId: '',
+	worksetStates: {},
+	theWorksetId: '',
+	entryStates: {},
+	theEntryId: '',
+	entry: {},
+	superEntry: {},
+	synset: {},
+	similars: [],
 };
