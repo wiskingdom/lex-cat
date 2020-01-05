@@ -27,14 +27,14 @@
 
 <script>
 export default {
-  name: "login",
+  name: 'login',
   data() {
     return {
       // information only for this component.
       user: {
-        email: "",
-        password: ""
-      }
+        email: '',
+        password: '',
+      },
     };
   },
   methods: {
@@ -42,17 +42,17 @@ export default {
       this.$auth
         .signInWithEmailAndPassword(this.user.email, this.user.password)
         .then(() => {
-          this.$router.push("home");
+          this.$router.push('home');
         })
         .catch(err => {
           this.$q.dialog({
-            title: "Error",
-            message: `${err.message}`
+            title: 'Error',
+            message: `${err.message}`,
           });
         });
       this.loading = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

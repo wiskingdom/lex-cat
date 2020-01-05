@@ -110,5 +110,5 @@ export {
   SYNSET,
   MERGING_SYNSET,
   MERGING_SYNSET_ID,
-  ISSUE
+  ISSUE,
 };

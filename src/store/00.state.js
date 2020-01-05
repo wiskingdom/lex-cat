@@ -2,39 +2,39 @@ export default {
   // meta
   domainNames: {},
   userContext: {
-    default: "",
-    role: "annotator"
+    default: '',
+    role: 'annotator',
   },
-  theDomain: "",
+  theDomain: '',
   users: [],
-  theUserId: "",
+  theUserId: '',
   refs: {},
   // entrywork
   labels: {
     pos: {},
-    sem: {}
+    sem: {},
   },
   summary: {
     all: {},
-    users: {}
+    users: {},
   },
   worksetStates: {},
-  theWorksetId: "",
+  theWorksetId: '',
   entryStates: {},
-  theEntryId: "",
+  theEntryId: '',
   superEntry: {},
   similars: {},
   searchedSimilar: {},
   entry: {
     isSkipped: false,
     needCheck: false,
-    pos: "",
-    sem: "",
-    synset: "",
-    updatedBy: ""
+    pos: '',
+    sem: '',
+    synset: '',
+    updatedBy: '',
   },
   synset: {},
   mergingSynset: {},
-  mergingSynsetId: "",
-  issue: {}
+  mergingSynsetId: '',
+  issue: {},
 };
