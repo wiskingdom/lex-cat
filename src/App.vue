@@ -102,20 +102,20 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
+import HelloWorld from "./components/HelloWorld.vue";
 
 export default {
-  name: 'LayoutDefault',
+  name: "LayoutDefault",
 
   components: {
-    HelloWorld,
+    HelloWorld
   },
 
   data() {
     return {
-      leftDrawerOpen: false,
+      leftDrawerOpen: false
     };
-  },
+  }
 };
 </script>
 
