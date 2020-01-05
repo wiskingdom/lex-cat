@@ -1,12 +1,14 @@
 export default {
   // meta
   domainNames: {},
-  theDomain: '',
-  users: {},
-  theUserId: '',
-  refs: {
-    summary: {},
+  userContext: {
+    default: '',
+    role: 'annotator',
   },
+  theDomain: '',
+  users: [],
+  theUserId: '',
+  refs: {},
   // entrywork
   labels: {
     pos: {},
@@ -21,8 +23,8 @@ export default {
   entryStates: {},
   theEntryId: '',
   superEntry: {},
-  similars: [],
-  searchedSimilars: {},
+  similars: {},
+  searchedSimilar: {},
   entry: {
     isSkipped: false,
     needCheck: false,
@@ -32,5 +34,7 @@ export default {
     updatedBy: '',
   },
   synset: {},
+  mergingSynset: {},
+  mergingSynsetId: '',
   issue: {},
 };
