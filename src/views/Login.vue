@@ -42,7 +42,7 @@ export default {
       this.$auth
         .signInWithEmailAndPassword(this.user.email, this.user.password)
         .then(() => {
-          this.$router.push('home');
+          this.$router.push('main');
         })
         .catch(err => {
           this.$q.dialog({
@@ -52,6 +52,9 @@ export default {
         });
       this.loading = false;
     },
+  },
+  created() {
+    this.$auth.signOut();
   },
 };
 </script>

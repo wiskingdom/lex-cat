@@ -11,11 +11,11 @@
           icon="menu"
         />
 
-        <q-toolbar-title>TRACK</q-toolbar-title>
+        <q-toolbar-title>사전 관리 도구</q-toolbar-title>
 
-        <div v-show="userEmail">
+        <div v-show="currentUserEmail">
           <q-icon :name="selectedMood" />
-          {{ userEmail }}
+          {{ currentUserEmail }}
         </div>
         <q-btn
           color="primary"
@@ -35,29 +35,73 @@
     >
       <div class="q-gutter-md" style="padding: 10px 10px;">
         <q-select
-          :value="theDocFolder"
-          @input="pickDocFolder"
+          :value="theDomain"
+          @input="pickTheDomain"
           filled
           dense
           options-dense
           bg-color="grey-2"
-          :options="docFolders"
+          :options="domainNames"
           emit-value
-          label="Select a folder"
+          label="Select a Domain"
         ></q-select>
+        <q-select
+          :value="theUserId"
+          @input="pickTheUserId"
+          filled
+          dense
+          options-dense
+          bg-color="grey-2"
+          :options="users"
+          emit-value
+          label="Select a User"
+          v-show="userContext.role === 'supervisor'"
+        ></q-select>
+        <q-select
+          :value="theWorksetId"
+          @input="pickTheWorksetId"
+          filled
+          dense
+          options-dense
+          bg-color="grey-2"
+          :options="worksets"
+          emit-value
+          label="Select a Set"
+        >
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption
+                  >{{ scope.opt.rate }}
+                  <q-badge
+                    color="positive"
+                    text-color="white"
+                    text-size="sm"
+                    v-show="scope.opt.allComplete"
+                  >
+                    완료
+                  </q-badge>
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template></q-select
+        >
+
         <q-list dense separator bordered class="bg-grey-1">
           <q-item
             clickable
             v-ripple
-            v-for="(item, key) in docIndex"
-            :to="`/main/${key}`"
-            :key="`${key}`"
-            v-show="item.folder === theDocFolder"
+            v-for="item in entryIndex"
+            :to="`/main/${item.value}`"
+            :key="`${item.value}`"
           >
             <q-item-section>
               <q-item-label>
-                {{ key }}
-                <q-badge color="grey-5">{{ item.state }}</q-badge>
+                {{ item.label }}
+                <q-badge :color="`${item.stageColor}`">{{
+                  item.stageText
+                }}</q-badge>
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -66,14 +110,6 @@
     </q-drawer>
 
     <q-page-container>
-      <!-- 실행 결과
-
-      <p>docIndex:<br> {{ docIndex }}</p>
-      <p>docFolders:<br> {{ docFolders }}</p>
-      <p>isFetchedMain:<br> {{ isFetchedMain }}</p>
-      <p>theDocFolder:<br> {{ theDocFolder }}</p>
-      <p>theDoc:<br> {{ theDoc }}</p>
-      -->
       <router-view />
     </q-page-container>
   </q-layout>
@@ -95,10 +131,6 @@ export default {
     currentUser() {
       return this.$auth.currentUser;
     },
-    userEmail() {
-      const { email } = this.currentUser ? this.currentUser : '';
-      return email;
-    },
     logBTN() {
       return this.currentUser ? 'logout' : 'login';
     },
@@ -113,16 +145,50 @@ export default {
         'airline_seat_individual_suite',
       ].sort(() => Math.random() - 0.5)[0];
     },
-    ...mapState(['docFolders']),
-    ...mapGetters(['isFetchedMain', 'docIndex', 'theDocFolder']),
+    ...mapState([
+      'domainNames',
+      'userContext',
+      'theDomain',
+      'users',
+      'theUserId',
+      'labels',
+      'worksetStates',
+      'theWorksetId',
+      'entryStates',
+      'theEntryId',
+    ]),
+    ...mapGetters([
+      'defaultDomain',
+      'currentUserEmail',
+      'worksets',
+      'entryIndex',
+    ]),
+  },
+  watch: {
+    theDomain() {
+      this.syncWorksetStates();
+    },
+    theUserId() {
+      this.syncWorksetStates();
+    },
+    theWorksetId() {
+      this.syncEntryStates();
+    },
   },
 
   methods: {
     ...mapActions([
-      'fetchDocIndex',
-      'fetchDocFolders',
-      'checkFechedMain',
-      'pickDocFolder',
+      'fetchDomainNames',
+      'fetchUserContext',
+      'pickTheUserId',
+      'fetchUsers',
+      'pickTheDomain',
+      'fetchLabels',
+      'syncSummary',
+      'syncWorksetStates',
+      'pickTheWorksetId',
+      'syncEntryStates',
+      'pickTheEntryId',
     ]),
     logout() {
       this.$auth.signOut().then(() => {
@@ -138,9 +204,17 @@ export default {
   },
 
   created() {
-    this.fetchDocIndex()
-      .then(this.fetchDocFolders)
-      .then(this.checkFechedMain);
+    Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(() => {
+      this.pickTheUserId(this.currentUserEmail);
+      this.pickTheDomain(this.defaultDomain).then(() => {
+        this.fetchUsers();
+        this.fetchLabels();
+        this.syncWorksetStates();
+      });
+    });
+  },
+  beforeDestroy() {
+    //this.$auth.signOut();
   },
 };
 </script>

@@ -10,33 +10,26 @@ const THE_DOMAIN = (state, payload) => {
 const USERS = (state, payload) => {
   state.users = payload;
 };
-
+const THE_USER_ID = (state, payload) => {
+  state.theUserId = payload;
+};
 const LABELS = (state, payload) => {
   state.labels = payload;
 };
 
-const SUMMARY = (state, { snap, ref }) => {
-  if (state.refs.summary) {
-    state.refs.summary.off();
-  }
-  state.refs.summary = ref;
+const SUMMARY = (state, { snap }) => {
+  // state.refs.summary = ref;
   state.summary = snap;
 };
-const WORKSET_STATES = (state, { snap, ref }) => {
-  if (state.refs.worksetStates) {
-    state.refs.worksetStates.off();
-  }
-  state.refs.worksetStates = ref;
+const WORKSET_STATES = (state, { snap }) => {
+  // state.refs.worksetStates = ref;
   state.worksetStates = snap;
 };
 const THE_WORKSET_ID = (state, payload) => {
   state.theWorksetId = payload;
 };
-const ENTRY_STATES = (state, { snap, ref }) => {
-  if (state.refs.entryStates) {
-    state.refs.entryStates.off();
-  }
-  state.refs.entryStates = ref;
+const ENTRY_STATES = (state, { snap }) => {
+  //  state.refs.entryStates = ref;
   state.entryStates = snap;
 };
 const THE_ENTRY_ID = (state, payload) => {
@@ -70,12 +63,12 @@ const ENTRY_POS = (state, payload) => {
 const ENTRY_SEM = (state, payload) => {
   state.entry.sem = payload;
 };
-const SYNSET = (state, { snap, ref }) => {
-  if (state.refs.synset) {
-    state.refs.synset.off();
-  }
-  state.refs.synset = ref;
-  state.synset = snap;
+const SYNSET = (state, payload) => {
+  // state.refs.synset = ref;
+  state.synset = payload;
+};
+const SYNS = (state, payload) => {
+  state.syns = payload;
 };
 const MERGING_SYNSET = (state, payload) => {
   state.mergingSynset = payload;
@@ -92,6 +85,7 @@ export {
   USER_CONTEXT,
   THE_DOMAIN,
   USERS,
+  THE_USER_ID,
   LABELS,
   SUMMARY,
   WORKSET_STATES,
@@ -111,4 +105,5 @@ export {
   MERGING_SYNSET,
   MERGING_SYNSET_ID,
   ISSUE,
+  SYNS,
 };

@@ -12,10 +12,24 @@ const fetchDomainNames = ({ commit }) =>
         resolve();
       });
   });
+const fetchUserContext = ({ commit }) =>
+  new Promise(resolve => {
+    db.ref(`/app/userContext/${auth.currentUser.uid}`)
+      .once('value')
+      .then(snap => {
+        commit('USER_CONTEXT', snap.val());
+        resolve();
+      });
+  });
 
 const pickTheDomain = ({ commit }, domainName) =>
   new Promise(resolve => {
     commit('THE_DOMAIN', domainName);
+    resolve();
+  });
+const pickTheUserId = ({ commit }, userId) =>
+  new Promise(resolve => {
+    commit('THE_USER_ID', userId);
     resolve();
   });
 
@@ -39,17 +53,11 @@ const fetchLabels = ({ state, commit }) =>
       });
   });
 
-const syncSummary = ({ state, commit }) => {
-  const ref = db.ref(`/dict/${state.theDomain}/summary`);
-  ref.on('value', snap => {
-    commit('SUMMARY', { snap: snap.val(), ref });
-  });
-};
 const syncWorksetStates = ({ state, commit }) => {
   const ref = db
     .ref(`/dict/${state.theDomain}/worksetStates`)
     .orderByChild('userId')
-    .equalTo(auth.currentUser.email);
+    .equalTo(state.theUserId);
   ref.on('value', snap => {
     commit('WORKSET_STATES', { snap: snap.val(), ref });
   });
@@ -67,6 +75,13 @@ const syncEntryStates = ({ state, commit }) => {
   );
   ref.on('value', snap => {
     commit('ENTRY_STATES', { snap: snap.val(), ref });
+  });
+};
+
+const syncSummary = ({ state, commit }) => {
+  const ref = db.ref(`/dict/${state.theDomain}/summary`);
+  ref.on('value', snap => {
+    commit('SUMMARY', { snap: snap.val(), ref });
   });
 };
 
@@ -129,37 +144,65 @@ const fetchEntry = ({ state, commit }) =>
     });
   });
 
-const syncSynset = ({ state, commit }) => {
-  const ref = db.ref(`/dict/${state.theDomain}/synsets/${state.entry.synset}`);
-  ref.on('value', snap => {
-    commit('SYNSET', { snap: snap.val(), ref });
-  });
-};
-const fetchMergingSynset = ({ state, commit }, entryId) => {
-  const ref = db.ref(`/dict/${state.theDomain}/entries/${entryId}`);
-  ref.once('value').then(entrySnap => {
-    const { synset } = entrySnap.val();
-    if (synset) {
-      commit('MERGING_SYNSET_ID', synset);
-      db.ref(`/dict/${state.theDomain}/synsets/${synset}`)
-        .once('value')
-        .then(synsetSnap => {
-          commit('MERGING_SYNSET', synsetSnap.val());
-        });
+const fetchSynset = ({ state, commit }) =>
+  new Promise(resolve => {
+    if (state.entry.synset) {
+      const ref = db.ref(
+        `/dict/${state.theDomain}/synsets/${state.entry.synset}`,
+      );
+      ref.once('value', snap => {
+        const synset = snap.val();
+        if (synset) {
+          commit('SYNSET', synset);
+          let syns = [];
+          Object.keys(synset).forEach(entryId => {
+            db.ref(`/dict/${state.theDomain}/entries/${entryId}`).once(
+              'value',
+              synSnap => {
+                syns.push(synSnap.val().orthForm);
+              },
+            );
+          });
+          commit('SYNS', syns);
+        } else {
+          commit('SYNS', []);
+          commit('SYNSET', {});
+        }
+      });
     } else {
-      commit('MERGING_SYNSET_ID', entryId);
-      const theSuperEntryId = getSuperEntryId(entryId);
-      db.ref(`/dict/${state.theDomain}/superEntries/${theSuperEntryId}`)
-        .once('value')
-        .then(superSnap => {
-          const { freq } = superSnap.val();
-          let mergingSynset = {};
-          mergingSynset[entryId] = freq;
-          commit('MERGING_SYNSET', mergingSynset);
-        });
+      commit('SYNS', []);
+      commit('SYNSET', {});
     }
+
+    resolve();
   });
-};
+const fetchMergingSynset = ({ state, commit }, entryId) =>
+  new Promise(resolve => {
+    const ref = db.ref(`/dict/${state.theDomain}/entries/${entryId}`);
+    ref.once('value').then(entrySnap => {
+      const { synset } = entrySnap.val();
+      if (synset) {
+        commit('MERGING_SYNSET_ID', synset);
+        db.ref(`/dict/${state.theDomain}/synsets/${synset}`)
+          .once('value')
+          .then(synsetSnap => {
+            commit('MERGING_SYNSET', synsetSnap.val());
+          });
+      } else {
+        commit('MERGING_SYNSET_ID', entryId);
+        const theSuperEntryId = getSuperEntryId(entryId);
+        db.ref(`/dict/${state.theDomain}/superEntries/${theSuperEntryId}`)
+          .once('value')
+          .then(superSnap => {
+            const { freq } = superSnap.val();
+            let mergingSynset = {};
+            mergingSynset[entryId] = freq;
+            commit('MERGING_SYNSET', mergingSynset);
+          });
+      }
+    });
+    resolve();
+  });
 const updateSynset = ({ state, commit }, mode) =>
   new Promise(resolve => {
     const mergeSyns = Object.keys(state.mergingSynset);
@@ -206,7 +249,9 @@ const updateSynset = ({ state, commit }, mode) =>
       ref.update({ synset: '' });
       commit('ENTRY_SYNSET', '');
     }
-    resolve();
+    window.setTimeout(() => {
+      resolve();
+    }, 500);
   });
 
 const fetchIssue = ({ state, commit }) => {
@@ -223,37 +268,44 @@ const changeSkip = ({ commit }, isSkipped) =>
   });
 const changeNeedCheck = ({ commit }, needCheck) =>
   new Promise(resolve => {
-    commit('ENTRY_SKIP', needCheck);
+    commit('ENTRY_NEED_CHECK', needCheck);
     resolve();
   });
 const changePos = ({ commit }, pos) =>
   new Promise(resolve => {
-    commit('ENTRY_SKIP', pos);
+    commit('ENTRY_POS', pos);
     resolve();
   });
 const changeSem = ({ commit }, sem) =>
   new Promise(resolve => {
-    commit('ENTRY_SKIP', sem);
+    commit('ENTRY_SEM', sem);
     resolve();
   });
 
-const updateEntryLabels = ({ state, commit }) => {
+const updateEntryLabels = ({ state, getters }) => {
   const { isSkipped, needCheck, pos, sem } = state.entry;
   const ref = db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`);
+  if (getters.semValid && sem) {
+    ref.update({
+      sem,
+      updatedBy: auth.currentUser.email,
+    });
+  }
+
   ref.update({
     isSkipped,
     needCheck,
     pos,
-    sem,
     updatedBy: auth.currentUser.email,
   });
-  commit('ENTRY_SYNSET', '');
 };
 
 export {
   fetchDomainNames,
-  pickTheDomain,
+  fetchUserContext,
   fetchUsers,
+  pickTheUserId,
+  pickTheDomain,
   fetchLabels,
   syncSummary,
   syncWorksetStates,
@@ -264,7 +316,7 @@ export {
   fetchSimilars,
   fetchSearchedSimilar,
   fetchEntry,
-  syncSynset,
+  fetchSynset,
   fetchMergingSynset,
   fetchIssue,
   updateSynset,

@@ -1,6 +1,6 @@
 export default {
   // meta
-  domainNames: {},
+  domainNames: [],
   userContext: {
     default: '',
     role: 'annotator',
@@ -13,6 +13,8 @@ export default {
   labels: {
     pos: {},
     sem: {},
+    posSemRes: {},
+    semTerminals: [],
   },
   summary: {
     all: {},
@@ -34,6 +36,7 @@ export default {
     updatedBy: '',
   },
   synset: {},
+  syns: [],
   mergingSynset: {},
   mergingSynsetId: '',
   issue: {},
