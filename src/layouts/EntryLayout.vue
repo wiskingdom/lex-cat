@@ -4,25 +4,28 @@
       <div class="q-gutter-md" style="padding: 60px 10px 0px 10px;">
         <q-btn
           dense
-          color="secondary"
+          flat
+          color="primary"
           icon="arrow_left"
           @click="push(`/main/${theWorksetId}-${prevSuperNum}-01`)"
           :disable="prevSuperNum === '00'"
         />
-        <q-btn dense color="secondary" label="제출" @click="update" />
+        <q-btn flat dense color="primary" icon="done" @click="update" />
         <q-btn
           dense
-          color="secondary"
+          flat
+          color="primary"
           icon="arrow_right"
           @click="push(`/main/${theWorksetId}-${nextSuperNum}-01`)"
           :disable="lastEntryId === nextSuperNum"
         />
         <q-checkbox
           dense
+          flat
           size="md"
           left-label
           text-color="primary"
-          color="teal"
+          color="secondary"
           :value="entry.needCheck"
           @input="changeNeedCheck"
           label="보류"
@@ -32,7 +35,7 @@
           dense
           no-caps
           unelevated
-          toggle-color="primary"
+          toggle-color="secondary"
           color="grey-4"
           text-color="black"
           :value="entry.isSkipped"
@@ -40,9 +43,6 @@
             { label: '등재', value: false },
             { label: '미등재', value: true },
           ]"
-          :class="{
-            'bg-positive': entry.isSkipped,
-          }"
           @input="changeSkip"
         />
 
@@ -52,6 +52,7 @@
 
         <q-btn
           outline
+          flat
           v-ripple
           size="md"
           label="NN"
@@ -63,6 +64,7 @@
         />
         <q-btn
           outline
+          flat
           v-ripple
           size="md"
           label="NE"
@@ -74,6 +76,7 @@
         />
         <q-btn
           outline
+          flat
           v-ripple
           size="md"
           label="VV"
@@ -94,11 +97,13 @@
         />
         <q-btn
           outline
+          flat
           size="sm"
           v-ripple
           v-for="item in semHints"
           :label="item.tag"
           color="grey-8"
+          class="text-blue-8 text-bold"
           :class="{
             'bg-positive': isSem(item.value),
           }"
@@ -145,12 +150,15 @@
             >[ {{ item }} ],
           </span>
         </p>
-        <p>{{ entryStates }}</p>
-        <p>{{ theDomain }}</p>
-        <p>{{ mergingSynsetId }}</p>
-        <p>{{ entry }}</p>
-        <p>{{ synset }}</p>
-        <p>{{ stageCode }}</p>
+        <p>
+          <span class=" sect text-blue-8 text-bold">정의</span>
+        </p>
+        <p>
+          <span class=" ej text-dark">{{ superEntry.description }}</span>
+          <span class=" ej text-dark" v-show="!superEntry.description"
+            >없음</span
+          >
+        </p>
 
         <q-dialog v-model="mergPop" :key="'merge'">
           <q-card>

@@ -255,7 +255,7 @@ const updateSynset = ({ state, commit }, mode) =>
     }
     window.setTimeout(() => {
       resolve();
-    }, 700);
+    }, 800);
   });
 
 const fetchIssue = ({ state, commit }) => {
