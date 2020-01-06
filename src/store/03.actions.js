@@ -59,7 +59,7 @@ const syncWorksetStates = ({ state, commit }) => {
     .orderByChild('userId')
     .equalTo(state.theUserId);
   ref.on('value', snap => {
-    commit('WORKSET_STATES', { snap: snap.val(), ref });
+    commit('WORKSET_STATES', snap.val());
   });
 };
 
@@ -73,11 +73,15 @@ const syncEntryStates = ({ state, commit }) => {
   const ref = db.ref(
     `/dict/${state.theDomain}/entryStates/${state.theWorksetId}`,
   );
-  ref.on('value', snap => {
-    commit('ENTRY_STATES', { snap: snap.val(), ref });
+  ref.once('value', snap => {
+    commit('ENTRY_STATES', snap.val());
   });
 };
-
+const changeStageCode = ({ commit }, payload) =>
+  new Promise(resolve => {
+    commit('STAGE_CODE', payload);
+    resolve();
+  });
 const syncSummary = ({ state, commit }) => {
   const ref = db.ref(`/dict/${state.theDomain}/summary`);
   ref.on('value', snap => {
@@ -251,7 +255,7 @@ const updateSynset = ({ state, commit }, mode) =>
     }
     window.setTimeout(() => {
       resolve();
-    }, 500);
+    }, 700);
   });
 
 const fetchIssue = ({ state, commit }) => {
@@ -282,23 +286,25 @@ const changeSem = ({ commit }, sem) =>
     resolve();
   });
 
-const updateEntryLabels = ({ state, getters }) => {
-  const { isSkipped, needCheck, pos, sem } = state.entry;
-  const ref = db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`);
-  if (getters.semValid && sem) {
+const updateEntryLabels = ({ state, getters }) =>
+  new Promise(resolve => {
+    const { isSkipped, needCheck, pos, sem } = state.entry;
+    const ref = db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`);
+    if (getters.semValid && sem) {
+      ref.update({
+        sem,
+        updatedBy: auth.currentUser.email,
+      });
+    }
+
     ref.update({
-      sem,
+      isSkipped,
+      needCheck,
+      pos,
       updatedBy: auth.currentUser.email,
     });
-  }
-
-  ref.update({
-    isSkipped,
-    needCheck,
-    pos,
-    updatedBy: auth.currentUser.email,
+    resolve();
   });
-};
 
 export {
   fetchDomainNames,
@@ -325,4 +331,5 @@ export {
   changePos,
   changeSem,
   updateEntryLabels,
+  changeStageCode,
 };

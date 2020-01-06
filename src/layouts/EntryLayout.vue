@@ -145,12 +145,12 @@
             >[ {{ item }} ],
           </span>
         </p>
-        <p>{{ mergingSynset }}</p>
+        <p>{{ entryStates }}</p>
         <p>{{ theDomain }}</p>
         <p>{{ mergingSynsetId }}</p>
         <p>{{ entry }}</p>
         <p>{{ synset }}</p>
-        <p>{{ theEntryId }}</p>
+        <p>{{ stageCode }}</p>
 
         <q-dialog v-model="mergPop" :key="'merge'">
           <q-card>
@@ -194,6 +194,7 @@ export default {
 
   computed: {
     ...mapState([
+      'entryStates',
       'theDomain',
       'theUserId',
       'theWorksetId',
@@ -223,6 +224,7 @@ export default {
       'entryIndex',
       'synsetList',
       'isSynMember',
+      'stageCode',
     ]),
   },
   watch: {
@@ -264,14 +266,15 @@ export default {
       'changePos',
       'changeSem',
       'updateEntryLabels',
+      'changeStageCode',
     ]),
     push(path) {
-      if (!this.semValid) {
+      if (!this.entry.needCheck && !this.semValid) {
         this.dialog('SEM CODE 입력이 유효하지 않습니다.');
       } else {
         this.$router.push(path);
       }
-      this.updateEntryLabels();
+      this.changeStageCode(this.stageCode).then(this.updateEntryLabels());
     },
     dialog(value) {
       this.$q.dialog({
@@ -285,10 +288,10 @@ export default {
       });
     },
     update() {
-      if (!this.semValid) {
+      if (!this.entry.needCheck && !this.semValid) {
         this.dialog('SEM CODE 입력이 유효하지 않습니다.');
       }
-      this.updateEntryLabels();
+      this.changeStageCode(this.stageCode).then(this.updateEntryLabels());
     },
     mergeReady(key) {
       if (!this.synset) {

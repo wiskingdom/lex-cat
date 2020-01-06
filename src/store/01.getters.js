@@ -93,7 +93,23 @@ const isSynMember = state => key => {
   const synset = state.synset ? state.synset : {};
   return !!synset[key];
 };
-
+const stageCode = state => {
+  const getEntryStage = (isSkipped, needCheck, pos, sem) => {
+    if (needCheck) {
+      return 1;
+    } else if (!isSkipped && pos && sem) {
+      return 3;
+    } else if (isSkipped) {
+      return 2;
+    } else if (pos || sem) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+  const { isSkipped, needCheck, pos, sem } = state.entry;
+  return getEntryStage(isSkipped, needCheck, pos, sem);
+};
 export {
   defaultDomain,
   currentUserEmail,
@@ -111,4 +127,5 @@ export {
   semValid,
   synsetList,
   isSynMember,
+  stageCode,
 };

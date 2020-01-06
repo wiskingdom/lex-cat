@@ -17,20 +17,24 @@ const LABELS = (state, payload) => {
   state.labels = payload;
 };
 
-const SUMMARY = (state, { snap }) => {
+const SUMMARY = (state, payload) => {
   // state.refs.summary = ref;
-  state.summary = snap;
+  state.summary = payload;
 };
-const WORKSET_STATES = (state, { snap }) => {
+const WORKSET_STATES = (state, payload) => {
   // state.refs.worksetStates = ref;
-  state.worksetStates = snap;
+  state.worksetStates = payload;
 };
 const THE_WORKSET_ID = (state, payload) => {
   state.theWorksetId = payload;
 };
-const ENTRY_STATES = (state, { snap }) => {
+const ENTRY_STATES = (state, payload) => {
   //  state.refs.entryStates = ref;
-  state.entryStates = snap;
+  state.entryStates = payload;
+};
+
+const STAGE_CODE = (state, payload) => {
+  state.entryStates[state.theEntryId].stage = payload;
 };
 const THE_ENTRY_ID = (state, payload) => {
   state.theEntryId = payload;
@@ -106,4 +110,5 @@ export {
   MERGING_SYNSET_ID,
   ISSUE,
   SYNS,
+  STAGE_CODE,
 };
