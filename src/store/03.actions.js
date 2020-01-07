@@ -118,25 +118,29 @@ const fetchSimilars = ({ state, commit }) => {
 };
 
 const fetchSearchedSimilar = ({ state, commit }, string) => {
-  const indexString = string.replace(/ /g, '');
-  const ref = db
-    .ref(`/dict/${state.theDomain}/superEntries`)
-    .orderByChild('indexForm')
-    .equalTo(indexString)
-    .limitToFirst(1);
-  ref.once('value').then(snap => {
-    if (snap.exists()) {
-      const theValue = snap.val();
-      const theSuperEntryId = Object.keys(theValue)[0];
-      const { orthForm } = theValue[theSuperEntryId];
-      let similar = {};
-      const entryId = `${theSuperEntryId}-01`;
-      similar[entryId] = orthForm;
-      commit('SEARCHED_SIMILAR', similar);
-    } else {
-      commit('SEARCHED_SIMILAR', {});
-    }
-  });
+  if (string) {
+    const indexString = string.replace(/ /g, '');
+    const ref = db
+      .ref(`/dict/${state.theDomain}/superEntries`)
+      .orderByChild('indexForm')
+      .startAt(indexString)
+      .endAt(`${indexString}\uf8ff")`);
+    ref.once('value').then(snap => {
+      if (snap.exists()) {
+        const theValue = snap.val();
+        const theSuperEntryIds = Object.keys(theValue);
+        let similar = {};
+        theSuperEntryIds.forEach(superId => {
+          similar[superId] = theValue[superId].orthForm;
+        });
+        commit('SEARCHED_SIMILAR', similar);
+      } else {
+        commit('SEARCHED_SIMILAR', {});
+      }
+    });
+  } else {
+    commit('SEARCHED_SIMILAR', {});
+  }
 };
 
 const fetchEntry = ({ state, commit }) =>

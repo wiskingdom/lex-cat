@@ -4,6 +4,19 @@
       <q-toolbar>
         <q-toolbar-title>사전 관리 도구</q-toolbar-title>
 
+        <q-btn
+          flat
+          class="text-bold"
+          color="grey-8"
+          unelevated
+          to="/main"
+          :label="'등재&분류 도구'"
+          style="margin-left: 10px"
+        />
+        <q-space />
+        <q-space />
+        <q-space />
+
         <div v-show="currentUserEmail">
           <q-icon :name="selectedMood" />
           {{ currentUserEmail }}

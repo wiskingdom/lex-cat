@@ -6,6 +6,7 @@
       </p>
       <p>
         <span class=" sect text-blue-8 text-bold">관련어</span>
+        <q-btn flat round dense icon="search" @click="onSearch" />
       </p>
       <p>
         <span
@@ -30,7 +31,11 @@
         <span class=" ej text-dark" v-show="!superEntry.description">없음</span>
       </p>
 
-      <q-dialog v-model="mergPop" :key="'merge'">
+      <q-dialog
+        v-model="mergPop"
+        transition-show="scale"
+        transition-hide="scale"
+      >
         <q-card>
           <q-card-section>
             <div class="text-h6">알림</div>
@@ -43,11 +48,20 @@
             <q-markup-table>
               <tr>
                 <td>
-                  <span>{{ mergingSyns }}</span>
+                  <span
+                    v-for="(item, index) in mergingSyns"
+                    :key="`msyn-${index}`"
+                    >{{ item }}<br
+                  /></span>
                 </td>
-                <td>+</td>
                 <td>
-                  <span :text="syns"></span>
+                  <span>+</span>
+                </td>
+                <td>
+                  <span v-show="!syns.length">{{ entry.orthForm }}</span>
+                  <span v-for="(item, index) in syns" :key="`syn-${index}`"
+                    >{{ item }}<br
+                  /></span>
                 </td>
               </tr>
             </q-markup-table>
@@ -61,6 +75,43 @@
               v-close-popup
             />
             <q-btn flat label="취소" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <!-- search -->
+      <q-dialog v-model="searchPop">
+        <q-card>
+          <q-card-section>
+            <q-form @submit="searchSubmit" class="q-gutter-md">
+              <q-input filled v-model="searchTerm" label="검색어" />
+              <q-btn label="검색" type="submit" color="primary" />
+            </q-form>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section style="max-width: 300px" class="scroll">
+            <p>
+              <span
+                class="ej text-dark"
+                :class="{
+                  'text-blue-8': isSynMember(`${key}-01`),
+                  'text-bold': isSynMember(`${key}-01`),
+                  'cursor-pointer': !isSynMember(`${key}-01`),
+                }"
+                @click="mergeReady(`${key}-01`)"
+                v-for="(item, key) in searchedSimilar"
+                v-show="item !== entry.orthForm"
+                :key="key"
+                >{{ item }}<br />
+              </span>
+            </p>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn flat label="닫기" color="primary" v-close-popup />
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -207,6 +258,8 @@ export default {
     return {
       right: true,
       mergPop: false,
+      searchPop: false,
+      searchTerm: '',
     };
   },
 
@@ -296,7 +349,17 @@ export default {
       }
       this.changeStageCode(this.stageCode).then(this.updateEntryLabels());
     },
-
+    offSearch() {
+      this.searchPop = false;
+    },
+    onSearch() {
+      this.searchTerm = '';
+      this.fetchSearchedSimilar('');
+      this.searchPop = true;
+    },
+    searchSubmit() {
+      this.fetchSearchedSimilar(this.searchTerm);
+    },
     dialog(value) {
       this.$q.dialog({
         title: 'Log',
@@ -334,6 +397,8 @@ export default {
         this.fetchMergingSynset(key).then(() => {
           this.mergPop = true;
         });
+      } else {
+        this.mergPop = true;
       }
     },
     fetch() {
