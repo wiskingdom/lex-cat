@@ -10,7 +10,6 @@
           aria-label="Menu"
           icon="menu"
         />
-
         <q-toolbar-title>사전 관리 도구</q-toolbar-title>
 
         <div v-show="currentUserEmail">
@@ -44,7 +43,9 @@
           :options="domainNames"
           emit-value
           label="Select a Domain"
-        ></q-select>
+        >
+          <template v-slot:prepend> <q-icon name="sort_by_alpha" /> </template>
+        </q-select>
         <q-select
           :value="theUserId"
           @input="pickTheUserId"
@@ -56,7 +57,9 @@
           emit-value
           label="Select a User"
           v-show="userContext.role === 'supervisor'"
-        ></q-select>
+        >
+          <template v-slot:prepend> <q-icon name="face" /> </template>
+        </q-select>
         <q-select
           :value="theWorksetId"
           @input="pickTheWorksetId"
@@ -68,6 +71,9 @@
           emit-value
           label="Select a Set"
         >
+          <template v-slot:prepend>
+            <q-icon name="folder" />
+          </template>
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
               <q-item-section>
@@ -123,7 +129,7 @@ export default {
 
   data() {
     return {
-      leftDrawerOpen: this.$q.platform.is.desktop,
+      leftDrawerOpen: true,
     };
   },
 

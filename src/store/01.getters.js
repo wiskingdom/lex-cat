@@ -73,7 +73,7 @@ const currentSemTag = state => {
   const value = state.entry.sem;
   const tag = state.labels.sem[value];
   if (!value) {
-    return { value, tag: 'INPUT CODE' };
+    return { value, tag: '미분류' };
   }
   return { value, tag };
 };
@@ -87,17 +87,23 @@ const semHints = state => {
   const semReg = new RegExp(`^${sem}\\d$`);
   return semCods.filter(item => item.value.match(semReg));
 };
-const semValid = state => state.labels.semTerminals.includes(state.entry.sem);
+const semValid = state => {
+  const pos = state.entry.pos ? state.entry.pos : 'any';
+  return state.labels.posSemValid[pos].includes(state.entry.sem);
+};
+const semIsIn = state => {
+  return Object.keys(state.labels.sem).includes(state.entry.sem);
+};
 const synsetList = state => Object.keys(state.synset);
 const isSynMember = state => key => {
   const synset = state.synset ? state.synset : {};
   return !!synset[key];
 };
-const stageCode = state => {
+const stageCode = (state, getters) => {
   const getEntryStage = (isSkipped, needCheck, pos, sem) => {
     if (needCheck) {
       return 1;
-    } else if (!isSkipped && pos && sem) {
+    } else if (!isSkipped && pos && sem && getters.semValid) {
       return 3;
     } else if (isSkipped) {
       return 2;
@@ -125,6 +131,7 @@ export {
   semHints,
   isSem,
   semValid,
+  semIsIn,
   synsetList,
   isSynMember,
   stageCode,

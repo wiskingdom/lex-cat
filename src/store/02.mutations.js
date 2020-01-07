@@ -18,18 +18,15 @@ const LABELS = (state, payload) => {
 };
 
 const SUMMARY = (state, payload) => {
-  // state.refs.summary = ref;
   state.summary = payload;
 };
 const WORKSET_STATES = (state, payload) => {
-  // state.refs.worksetStates = ref;
   state.worksetStates = payload;
 };
 const THE_WORKSET_ID = (state, payload) => {
   state.theWorksetId = payload;
 };
 const ENTRY_STATES = (state, payload) => {
-  //  state.refs.entryStates = ref;
   state.entryStates = payload;
 };
 
@@ -68,7 +65,6 @@ const ENTRY_SEM = (state, payload) => {
   state.entry.sem = payload;
 };
 const SYNSET = (state, payload) => {
-  // state.refs.synset = ref;
   state.synset = payload;
 };
 const SYNS = (state, payload) => {
@@ -76,6 +72,9 @@ const SYNS = (state, payload) => {
 };
 const MERGING_SYNSET = (state, payload) => {
   state.mergingSynset = payload;
+};
+const MERGING_SYNS = (state, payload) => {
+  state.mergingSyns = payload;
 };
 const MERGING_SYNSET_ID = (state, payload) => {
   state.mergingSynsetId = payload;
@@ -107,6 +106,7 @@ export {
   ENTRY_SEM,
   SYNSET,
   MERGING_SYNSET,
+  MERGING_SYNS,
   MERGING_SYNSET_ID,
   ISSUE,
   SYNS,

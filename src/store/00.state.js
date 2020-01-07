@@ -13,8 +13,7 @@ export default {
   labels: {
     pos: {},
     sem: {},
-    posSemRes: {},
-    semTerminals: [],
+    posSemValid: {},
   },
   summary: {
     all: {},
@@ -38,6 +37,7 @@ export default {
   synset: {},
   syns: [],
   mergingSynset: {},
-  mergingSynsetId: '',
+  mergingSyns: [],
+  mergingOrth: '',
   issue: {},
 };

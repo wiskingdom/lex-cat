@@ -168,17 +168,18 @@ const fetchSynset = ({ state, commit }) =>
             );
           });
           commit('SYNS', syns);
+          resolve();
         } else {
           commit('SYNS', []);
           commit('SYNSET', {});
+          resolve();
         }
       });
     } else {
       commit('SYNS', []);
       commit('SYNSET', {});
+      resolve();
     }
-
-    resolve();
   });
 const fetchMergingSynset = ({ state, commit }, entryId) =>
   new Promise(resolve => {
@@ -190,7 +191,23 @@ const fetchMergingSynset = ({ state, commit }, entryId) =>
         db.ref(`/dict/${state.theDomain}/synsets/${synset}`)
           .once('value')
           .then(synsetSnap => {
-            commit('MERGING_SYNSET', synsetSnap.val());
+            const mergingSynset = synsetSnap.val();
+            commit('MERGING_SYNSET', mergingSynset);
+            if (mergingSynset) {
+              let syns = [];
+              Object.keys(mergingSynset).forEach(mEntryId => {
+                db.ref(`/dict/${state.theDomain}/entries/${mEntryId}`).once(
+                  'value',
+                  synSnap => {
+                    syns.push(synSnap.val().orthForm);
+                  },
+                );
+              });
+              commit('MERGING_SYNS', syns);
+              resolve();
+            } else {
+              resolve();
+            }
           });
       } else {
         commit('MERGING_SYNSET_ID', entryId);
@@ -198,14 +215,15 @@ const fetchMergingSynset = ({ state, commit }, entryId) =>
         db.ref(`/dict/${state.theDomain}/superEntries/${theSuperEntryId}`)
           .once('value')
           .then(superSnap => {
-            const { freq } = superSnap.val();
+            const { freq, orthForm } = superSnap.val();
             let mergingSynset = {};
             mergingSynset[entryId] = freq;
             commit('MERGING_SYNSET', mergingSynset);
+            commit('MERGING_SYNS', [orthForm]);
+            resolve();
           });
       }
     });
-    resolve();
   });
 const updateSynset = ({ state, commit }, mode) =>
   new Promise(resolve => {
@@ -213,6 +231,7 @@ const updateSynset = ({ state, commit }, mode) =>
     const mergingSynsetSize = mergeSyns.length;
     if (mode !== 'delete') {
       if (state.entry.synset) {
+        commit('SYNS', [...state.syns, ...state.mergingSyns]);
         const syns = Object.keys(state.synset);
         const synsetSize = syns.length;
         if (synsetSize + 1 >= mergingSynsetSize) {
@@ -235,6 +254,7 @@ const updateSynset = ({ state, commit }, mode) =>
           commit('ENTRY_SYNSET', state.mergingSynsetId);
         }
       } else {
+        commit('SYNS', [state.entry.orthForm, ...state.mergingSyns]);
         const ref = db.ref(
           `/dict/${state.theDomain}/entries/${state.theEntryId}`,
         );
@@ -252,10 +272,9 @@ const updateSynset = ({ state, commit }, mode) =>
       );
       ref.update({ synset: '' });
       commit('ENTRY_SYNSET', '');
+      commit('SYNS', []);
     }
-    window.setTimeout(() => {
-      resolve();
-    }, 800);
+    resolve();
   });
 
 const fetchIssue = ({ state, commit }) => {
@@ -290,17 +309,15 @@ const updateEntryLabels = ({ state, getters }) =>
   new Promise(resolve => {
     const { isSkipped, needCheck, pos, sem } = state.entry;
     const ref = db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`);
-    if (getters.semValid && sem) {
+    if (getters.semValid) {
       ref.update({
         sem,
-        updatedBy: auth.currentUser.email,
+        pos,
       });
     }
-
     ref.update({
       isSkipped,
       needCheck,
-      pos,
       updatedBy: auth.currentUser.email,
     });
     resolve();
