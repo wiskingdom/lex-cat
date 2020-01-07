@@ -31,7 +31,7 @@ const entryIndex = state => {
       } else if (stageCode === 2) {
         return '미등재';
       } else {
-        return '진행';
+        return '보류';
       }
     };
     const getStageColor = stageCode => {
@@ -107,8 +107,6 @@ const stageCode = (state, getters) => {
       return 3;
     } else if (isSkipped) {
       return 2;
-    } else if (pos || sem) {
-      return 1;
     } else {
       return 0;
     }

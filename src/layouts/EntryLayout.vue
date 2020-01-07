@@ -69,7 +69,7 @@
     <!-- right side -->
     <div
       class="col-4 col-md-4 q-gutter-md"
-      style="padding: 20px 0px; border-left: 1px solid LightGray; min-width: 380px"
+      style="padding: 0px; border-left: 1px solid LightGray; min-width: 380px"
     >
       <q-btn
         dense
