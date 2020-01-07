@@ -2,14 +2,6 @@
   <q-layout view="HHh Lpr lFf">
     <q-header bordered class="bg-grey-2 text-primary">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          @click="leftDrawerOpen = !leftDrawerOpen"
-          aria-label="Menu"
-          icon="menu"
-        />
         <q-toolbar-title>사전 관리 도구</q-toolbar-title>
 
         <div v-show="currentUserEmail">
@@ -116,6 +108,14 @@
     </q-drawer>
 
     <q-page-container>
+      <q-btn
+        dense
+        unelevated
+        color="primary"
+        @click="leftDrawerOpen = !leftDrawerOpen"
+        aria-label="Menu"
+        icon="menu"
+      />
       <router-view />
     </q-page-container>
   </q-layout>

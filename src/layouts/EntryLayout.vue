@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col q-gutter-md" style="padding: 20px;">
+    <div class="col q-gutter-md" style="padding: 10px 20px;">
       <p>
         <span class="entry text-dark text-bold">{{ superEntry.orthForm }}</span>
       </p>
