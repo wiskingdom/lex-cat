@@ -69,6 +69,9 @@ const pickTheWorksetId = ({ commit }, worksetId) =>
     resolve();
   });
 
+const initEntryStates = ({ commit }) => {
+  commit('ENTRY_STATES', {});
+};
 const syncEntryStates = ({ state, commit }) => {
   const ref = db.ref(
     `/dict/${state.theDomain}/entryStates/${state.theWorksetId}`,
@@ -337,6 +340,7 @@ export {
   syncSummary,
   syncWorksetStates,
   pickTheWorksetId,
+  initEntryStates,
   syncEntryStates,
   pickTheEntryId,
   fetchSuperEntry,

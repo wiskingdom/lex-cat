@@ -17,9 +17,9 @@
         <q-space />
         <q-space />
 
-        <div v-show="currentUserEmail">
+        <div v-show="theUserId">
           <q-icon :name="selectedMood" />
-          {{ currentUserEmail }}
+          {{ theUserId }}
         </div>
         <q-btn
           color="primary"
@@ -129,7 +129,7 @@
         aria-label="Menu"
         icon="menu"
       />
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </q-page-container>
   </q-layout>
 </template>
@@ -176,12 +176,7 @@ export default {
       'entryStates',
       'theEntryId',
     ]),
-    ...mapGetters([
-      'defaultDomain',
-      'currentUserEmail',
-      'worksets',
-      'entryIndex',
-    ]),
+    ...mapGetters(['defaultDomain', 'worksets', 'entryIndex']),
   },
   watch: {
     theDomain() {
@@ -206,6 +201,7 @@ export default {
       'syncSummary',
       'syncWorksetStates',
       'pickTheWorksetId',
+      'initEntryStates',
       'syncEntryStates',
       'pickTheEntryId',
     ]),
@@ -223,8 +219,12 @@ export default {
   },
 
   created() {
+    console.log('entry created');
+    console.log(this.theUserId);
+    console.log(this.theWorksetId);
+    console.log(this.entryIndex);
     Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(() => {
-      this.pickTheUserId(this.currentUserEmail);
+      this.pickTheUserId(this.$auth.currentUser.email);
       this.pickTheDomain(this.defaultDomain).then(() => {
         this.fetchUsers();
         this.fetchLabels();
@@ -234,6 +234,13 @@ export default {
   },
   beforeDestroy() {
     //this.$auth.signOut();
+    console.log('entry destroy');
+    console.log(this.theUserId);
+    console.log(this.theWorksetId);
+    console.log(this.entryIndex);
+    this.pickTheUserId('');
+    this.pickTheWorksetId('');
+    this.initEntryStates();
   },
 };
 </script>

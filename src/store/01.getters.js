@@ -1,9 +1,5 @@
-import fireapp from '@/fireapp';
-const auth = fireapp.auth();
-
 // for main layout
 const defaultDomain = state => state.userContext.default;
-const currentUserEmail = () => auth.currentUser.email;
 const worksets = state => {
   if (!state.worksetStates) {
     return [];
@@ -116,7 +112,6 @@ const stageCode = (state, getters) => {
 };
 export {
   defaultDomain,
-  currentUserEmail,
   worksets,
   entryIndex,
   theSuperEntryId,
