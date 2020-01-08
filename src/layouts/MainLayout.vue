@@ -219,10 +219,6 @@ export default {
   },
 
   created() {
-    console.log('entry created');
-    console.log(this.theUserId);
-    console.log(this.theWorksetId);
-    console.log(this.entryIndex);
     Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(() => {
       this.pickTheUserId(this.$auth.currentUser.email);
       this.pickTheDomain(this.defaultDomain).then(() => {
@@ -234,10 +230,7 @@ export default {
   },
   beforeDestroy() {
     //this.$auth.signOut();
-    console.log('entry destroy');
-    console.log(this.theUserId);
-    console.log(this.theWorksetId);
-    console.log(this.entryIndex);
+
     this.pickTheUserId('');
     this.pickTheWorksetId('');
     this.initEntryStates();

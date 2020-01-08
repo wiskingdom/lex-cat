@@ -340,6 +340,7 @@ export default {
       'changeSem',
       'updateEntryLabels',
       'changeStageCode',
+      'initEntry',
     ]),
     push(path) {
       if (!this.entry.needCheck && !this.semValid) {
@@ -438,6 +439,10 @@ export default {
     } else {
       this.fetch();
     }
+  },
+  beforeDestroy() {
+    this.pickTheEntryId('');
+    this.initEntry();
   },
 };
 </script>
