@@ -441,7 +441,6 @@ export default {
     }
   },
   beforeDestroy() {
-    console.log('Entry destroy');
     this.initEntry();
   },
 };
