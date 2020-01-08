@@ -440,10 +440,6 @@ export default {
       this.fetch();
     }
   },
-  beforeDestroy() {
-    this.pickTheEntryId('');
-    this.initEntry();
-  },
 };
 </script>
 <style>
