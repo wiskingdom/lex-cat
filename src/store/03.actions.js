@@ -101,13 +101,8 @@ const pickTheEntryId = ({ commit }, entryId) =>
 const initEntry = ({ commit }) => {
   commit('SUPER_ENTRY', {});
   commit('SIMILARS', {});
-  commit('SEARCHED_SIMILAR', {});
   commit('ENTRY', {});
   commit('SYNS', []);
-  commit('SYNSET', {});
-  commit('MERGING_SYNS', []);
-  commit('MERGING_SYNSET', {});
-  commit('MERGING_SYNSET_ID', '');
   commit('ISSUE', {});
 };
 const getSuperEntryId = entryId =>

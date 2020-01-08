@@ -440,6 +440,10 @@ export default {
       this.fetch();
     }
   },
+  beforeDestroy() {
+    console.log('Entry destroy');
+    this.initEntry();
+  },
 };
 </script>
 <style>
