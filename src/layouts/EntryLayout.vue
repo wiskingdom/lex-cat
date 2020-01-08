@@ -399,7 +399,7 @@ export default {
           this.mergPop = true;
         });
       } else {
-        this.mergPop = true;
+        this.mergPop = false;
       }
     },
     fetch() {
