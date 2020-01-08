@@ -4,6 +4,9 @@ import Login from '../views/Login.vue';
 import MainLayout from '../layouts/MainLayout.vue';
 //import MainAbout from '../views/MainAbout.vue';
 import EntryLayout from '../layouts/EntryLayout.vue';
+import fireapp from '@/fireapp';
+// const db = fireapp.database();
+const auth = fireapp.auth();
 
 Vue.use(VueRouter);
 
@@ -25,10 +28,24 @@ const routes = [
     path: '/main',
     name: 'main',
     component: MainLayout,
+    beforeEnter: (to, from, next) => {
+      if (auth.currentUser) {
+        next();
+      } else {
+        next('/');
+      }
+    },
     children: [
       {
         path: ':entryId',
         component: EntryLayout,
+        beforeEnter: (to, from, next) => {
+          if (auth.currentUser) {
+            next();
+          } else {
+            next('/');
+          }
+        },
       },
     ],
   },
