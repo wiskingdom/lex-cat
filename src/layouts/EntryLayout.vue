@@ -242,7 +242,14 @@
       </q-bar>
 
       <p>
-        <span v-for="(item, index) in syns" :key="index">{{ item }}<br /></span>
+        <span
+          :class="{
+            'text-bold': item === entry.orthForm,
+          }"
+          v-for="(item, index) in syns"
+          :key="index"
+          >{{ item }}<br
+        /></span>
       </p>
     </div>
   </div>

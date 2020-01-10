@@ -103,6 +103,7 @@ const initEntry = ({ commit }) => {
   commit('SIMILARS', {});
   commit('ENTRY', {});
   commit('SYNS', []);
+  commit('SYNSET', {});
   commit('ISSUE', {});
 };
 const getSuperEntryId = entryId =>
@@ -246,6 +247,7 @@ const updateSynset = ({ state, commit }, mode) =>
     if (mode !== 'delete') {
       if (state.entry.synset) {
         commit('SYNS', [...state.syns, ...state.mergingSyns]);
+        commit('SYNSET', { ...state.syns, ...state.mergingSynset });
         const syns = Object.keys(state.synset);
         const synsetSize = syns.length;
         if (synsetSize + 1 >= mergingSynsetSize) {
@@ -268,7 +270,10 @@ const updateSynset = ({ state, commit }, mode) =>
           commit('ENTRY_SYNSET', state.mergingSynsetId);
         }
       } else {
+        const syns = {};
+        syns[state.theEntryId] = state.entry.orthForm;
         commit('SYNS', [state.entry.orthForm, ...state.mergingSyns]);
+        commit('SYNSET', { ...syns, ...state.mergingSynset });
         const ref = db.ref(
           `/dict/${state.theDomain}/entries/${state.theEntryId}`,
         );
@@ -287,6 +292,7 @@ const updateSynset = ({ state, commit }, mode) =>
       ref.update({ synset: '' });
       commit('ENTRY_SYNSET', '');
       commit('SYNS', []);
+      commit('SYNSET', {});
     }
     resolve();
   });
