@@ -2,10 +2,10 @@
 const defaultDomain = state => state.userContext.default;
 const annotatorCode = state => state.users.indexOf(state.theUserId);
 const worksetIndex = state => {
-  if (!state.worksetStates) {
+  if (!state.worksets) {
     return [];
   }
-  return Object.entries(state.workses).map(([label, features]) => {
+  return Object.entries(state.worksets).map(([label, features]) => {
     const value = label;
     const { cntCompletes, cntEntries, cntOpenIssues } = features;
     const rate = `${cntCompletes}/${cntEntries}`;
@@ -14,10 +14,10 @@ const worksetIndex = state => {
   });
 };
 const entryIndex = state => {
-  if (!state.entryStates) {
+  if (!state.entryMarkings) {
     return [];
   }
-  return Object.entries(state.entryStates).map(([value, features]) => {
+  return Object.entries(state.entryMarkings).map(([value, features]) => {
     const { hasSynset, issueProcess, stage, orthForm } = features;
     const label = orthForm;
     const getStageText = stageCode => {
@@ -87,7 +87,8 @@ const semValid = state => {
 const semIsIn = state => {
   return Object.keys(state.labels.sem).includes(state.entry.sem);
 };
-const synsetList = state => Object.keys(state.synset);
+const syns = state => Object.keys(state.synset) || [];
+const mergingSyns = state => Object.keys(state.mergingSynset) || [];
 const isSynMember = state => key => {
   const synset = state.synset ? state.synset : {};
   return !!synset[key];
@@ -122,7 +123,8 @@ export {
   isSem,
   semValid,
   semIsIn,
-  synsetList,
+  syns,
+  mergingSyns,
   isSynMember,
   stageCode,
 };

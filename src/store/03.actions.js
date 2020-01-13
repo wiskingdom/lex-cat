@@ -95,10 +95,8 @@ const pickTheEntryId = ({ commit }, entryId) =>
   });
 
 const initEntry = ({ commit }) => {
-  commit('ENTRY_INFO', {});
   commit('SIMILARS', {});
   commit('ENTRY', {});
-  commit('SYNS', []);
   commit('SYNSET', {});
   commit('ISSUE', {});
 };
@@ -305,14 +303,16 @@ const updateEntry = ({ state, getters }) =>
   });
 const updateStageCode = ({ state, commit }, stage) =>
   new Promise(resolve => {
+    const { theWorksetId, theEntryId } = state;
     commit('STAGE_CODE', stage);
     db.ref(
-      `/dict/${state.theDomain}/entryMarkings/${state.theEntryId}`,
+      `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
     ).update({ stage });
     resolve();
   });
 
 export {
+  // common
   fetchDomainNames,
   fetchUserContext,
   fetchUsers,
@@ -320,11 +320,12 @@ export {
   pickTheDomain,
   fetchLabels,
   syncSummary,
-  syncWorksets,
+  syncWorksets, // 'syncWorksetStates',
   pickTheWorksetId,
-  initEntryMarkings,
-  fetchEntryMarkings,
+  initEntryMarkings, // 'initEntryStates',
+  fetchEntryMarkings, // 'syncEntryStates',
   pickTheEntryId,
+  // entrywork
   fetchSimilars,
   fetchSearchedSimilar,
   fetchEntry,
@@ -337,7 +338,7 @@ export {
   changePos,
   changeSem,
   changeExtraSyns,
-  updateEntry,
+  updateEntry, //'updateEntryLabels',
   updateStageCode,
   initEntry,
 };

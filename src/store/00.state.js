@@ -41,6 +41,5 @@ export default {
   synset: {},
   mergingSynset: {},
   mergingSynsetId: '',
-  mergingOrth: '',
   issue: {},
 };

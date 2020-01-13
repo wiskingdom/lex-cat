@@ -272,12 +272,10 @@ export default {
 
   computed: {
     ...mapState([
-      'entryStates',
       'theDomain',
       'theUserId',
       'theWorksetId',
       'theEntryId',
-      'superEntry',
       'similars',
       'searchedSimilar',
       'entry',
@@ -290,7 +288,6 @@ export default {
       'mergingSyns',
     ]),
     ...mapGetters([
-      'theSuperEntryId',
       'theSuperNum',
       'prevSuperNum',
       'nextSuperNum',
@@ -300,11 +297,11 @@ export default {
       'semHints',
       'isSem',
       'semValid',
+      'semIsIn',
       'entryIndex',
-      'synsetList',
+      'syns',
       'isSynMember',
       'stageCode',
-      'semIsIn',
     ]),
   },
   watch: {
@@ -329,11 +326,9 @@ export default {
       'pickTheDomain',
       'fetchLabels',
       'syncSummary',
-      'syncWorksetStates',
+      'syncWorksets',
       'pickTheWorksetId',
-      'syncEntryStates',
       'pickTheEntryId',
-      'fetchSuperEntry',
       'fetchSimilars',
       'fetchSearchedSimilar',
       'fetchEntry',
@@ -345,8 +340,9 @@ export default {
       'changeNeedCheck',
       'changePos',
       'changeSem',
-      'updateEntryLabels',
-      'changeStageCode',
+      'changeExtraSyns', // 신규
+      'updateEntry',
+      'updateStageCode',
       'initEntry',
     ]),
     push(path) {
@@ -355,7 +351,7 @@ export default {
       } else {
         this.$router.push(path);
       }
-      this.changeStageCode(this.stageCode).then(this.updateEntryLabels());
+      this.updateStageCode(this.stageCode).then(this.updateEntry());
     },
     offSearch() {
       this.searchPop = false;
@@ -394,7 +390,7 @@ export default {
       if (!this.entry.needCheck && !this.entry.isSkipped && !this.semValid) {
         this.dialog('범주 분류가 유효하지 않습니다.');
       }
-      this.changeStageCode(this.stageCode).then(this.updateEntryLabels());
+      this.updateStageCode(this.stageCode).then(this.updateEntry());
     },
     mergeReady(key) {
       if (!this.synset) {
@@ -415,7 +411,6 @@ export default {
         this.fetchEntry().then(() => {
           this.fetchSynset();
         });
-        this.fetchSuperEntry();
         this.fetchSimilars();
         this.pickTheEntryId(entryId);
         const worksetId = entryId
@@ -432,7 +427,7 @@ export default {
           this.pickTheDomain(this.defaultDomain).then(() => {
             this.fetchUsers();
             this.fetchLabels();
-            this.syncWorksetStates();
+            this.syncWorksets();
             this.fetch();
           });
         },

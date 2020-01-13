@@ -72,7 +72,7 @@
           dense
           options-dense
           bg-color="grey-2"
-          :options="worksets"
+          :options="worksetIndex"
           emit-value
           label="Select a Set"
         >
@@ -170,23 +170,19 @@ export default {
       'theDomain',
       'users',
       'theUserId',
-      'labels',
-      'worksetStates',
       'theWorksetId',
-      'entryStates',
-      'theEntryId',
     ]),
-    ...mapGetters(['defaultDomain', 'worksets', 'entryIndex']),
+    ...mapGetters(['defaultDomain', 'worksetIndex', 'entryIndex']),
   },
   watch: {
     theDomain() {
-      this.syncWorksetStates();
+      this.syncWorksets();
     },
     theUserId() {
-      this.syncWorksetStates();
+      this.syncWorksets();
     },
     theWorksetId() {
-      this.syncEntryStates();
+      this.fetchEntryMarkings();
     },
   },
 
@@ -194,15 +190,15 @@ export default {
     ...mapActions([
       'fetchDomainNames',
       'fetchUserContext',
-      'pickTheUserId',
       'fetchUsers',
+      'pickTheUserId',
       'pickTheDomain',
       'fetchLabels',
       'syncSummary',
-      'syncWorksetStates',
+      'syncWorksets',
       'pickTheWorksetId',
-      'initEntryStates',
-      'syncEntryStates',
+      'initEntryMarkings',
+      'fetchEntryMarkings',
       'pickTheEntryId',
     ]),
     logout() {
@@ -233,7 +229,7 @@ export default {
 
     this.pickTheUserId('');
     this.pickTheWorksetId('');
-    this.initEntryStates();
+    this.initEntryMarkings();
   },
 };
 </script>
