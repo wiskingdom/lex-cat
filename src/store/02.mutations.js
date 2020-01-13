@@ -20,24 +20,21 @@ const LABELS = (state, payload) => {
 const SUMMARY = (state, payload) => {
   state.summary = payload;
 };
-const WORKSET_STATES = (state, payload) => {
-  state.worksetStates = payload;
+const WORKSETS = (state, payload) => {
+  state.worksets = payload;
 };
 const THE_WORKSET_ID = (state, payload) => {
   state.theWorksetId = payload;
 };
-const ENTRY_STATES = (state, payload) => {
-  state.entryStates = payload;
+const ENTRY_MARKINGS = (state, payload) => {
+  state.entryMarkings = payload;
 };
 
 const STAGE_CODE = (state, payload) => {
-  state.entryStates[state.theEntryId].stage = payload;
+  state.entryMarkings[state.theEntryId].stage = payload;
 };
 const THE_ENTRY_ID = (state, payload) => {
   state.theEntryId = payload;
-};
-const SUPER_ENTRY = (state, payload) => {
-  state.superEntry = payload;
 };
 const SIMILARS = (state, payload) => {
   state.similars = payload;
@@ -48,9 +45,11 @@ const SEARCHED_SIMILAR = (state, payload) => {
 const ENTRY = (state, payload) => {
   state.entry = payload;
 };
-
-const ENTRY_SYNSET = (state, payload) => {
-  state.entry.synset = payload;
+const ENTRY_SYN_OF = (state, payload) => {
+  state.entry.synOf = payload;
+};
+const ENTRY_EXTRA_SYNS = (state, payload) => {
+  state.entry.extraSyns = payload;
 };
 const ENTRY_SKIP = (state, payload) => {
   state.entry.isSkipped = payload;
@@ -67,14 +66,8 @@ const ENTRY_SEM = (state, payload) => {
 const SYNSET = (state, payload) => {
   state.synset = payload;
 };
-const SYNS = (state, payload) => {
-  state.syns = payload;
-};
 const MERGING_SYNSET = (state, payload) => {
   state.mergingSynset = payload;
-};
-const MERGING_SYNS = (state, payload) => {
-  state.mergingSyns = payload;
 };
 const MERGING_SYNSET_ID = (state, payload) => {
   state.mergingSynsetId = payload;
@@ -91,24 +84,22 @@ export {
   THE_USER_ID,
   LABELS,
   SUMMARY,
-  WORKSET_STATES,
+  WORKSETS,
   THE_WORKSET_ID,
-  ENTRY_STATES,
+  ENTRY_MARKINGS,
   THE_ENTRY_ID,
-  SUPER_ENTRY,
   SIMILARS,
   SEARCHED_SIMILAR,
   ENTRY,
-  ENTRY_SYNSET,
+  ENTRY_SYN_OF,
+  ENTRY_EXTRA_SYNS,
   ENTRY_SKIP,
   ENTRY_NEED_CHECK,
   ENTRY_POS,
   ENTRY_SEM,
   SYNSET,
   MERGING_SYNSET,
-  MERGING_SYNS,
   MERGING_SYNSET_ID,
   ISSUE,
-  SYNS,
   STAGE_CODE,
 };

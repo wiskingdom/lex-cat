@@ -1,10 +1,11 @@
 // for main layout
 const defaultDomain = state => state.userContext.default;
-const worksets = state => {
+const annotatorCode = state => state.users.indexOf(state.theUserId);
+const worksetIndex = state => {
   if (!state.worksetStates) {
     return [];
   }
-  return Object.entries(state.worksetStates).map(([label, features]) => {
+  return Object.entries(state.workses).map(([label, features]) => {
     const value = label;
     const { cntCompletes, cntEntries, cntOpenIssues } = features;
     const rate = `${cntCompletes}/${cntEntries}`;
@@ -46,11 +47,7 @@ const entryIndex = state => {
     return { label, value, stageColor, stageText, hasSynset, issueProcess };
   });
 };
-const theSuperEntryId = state =>
-  state.theEntryId
-    .split('-')
-    .slice(0, 3)
-    .join('-');
+
 const theSuperNum = state => state.theEntryId.split('-').slice(2, 3)[0];
 const prevSuperNum = (state, getters) => {
   const prevNum = Number(getters.theSuperNum) - 1;
@@ -112,9 +109,9 @@ const stageCode = (state, getters) => {
 };
 export {
   defaultDomain,
-  worksets,
+  annotatorCode,
+  worksetIndex,
   entryIndex,
-  theSuperEntryId,
   theSuperNum,
   prevSuperNum,
   nextSuperNum,
