@@ -9,7 +9,7 @@
           class="text-bold"
           color="grey-8"
           unelevated
-          to="/main"
+          to="/main/about"
           :label="'등재&분류 도구'"
           style="margin-left: 10px"
         />

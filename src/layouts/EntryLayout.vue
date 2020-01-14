@@ -1,9 +1,36 @@
 <template>
   <div class="row">
     <div class="col q-gutter-md" style="padding: 10px 20px;">
-      <p>
-        <span class="entry text-dark text-bold">{{ entry.orthForm }}</span>
-      </p>
+      <div class="row">
+        <div class="col">
+          <span class="entry text-dark text-bold">{{ entry.orthForm }} </span>
+          <q-btn
+            flat
+            round
+            dense
+            icon="file_copy"
+            @click="copyToClipboard(entry.orthForm)"
+          />
+        </div>
+        <div class="col">
+          <q-btn
+            class="text-bold"
+            color="grey-8"
+            unelevated
+            label="매일경제"
+            style="margin-left: 10px"
+            @click="dailyPop()"
+          />
+          <q-btn
+            class="text-bold"
+            color="grey-8"
+            unelevated
+            label="기업정보"
+            style="margin-left: 10px"
+            @click="nicePop()"
+          />
+        </div>
+      </div>
       <p>
         <span class=" sect text-blue-8 text-bold">관련어</span>
         <q-btn flat round dense icon="search" @click="onSearch" />
@@ -276,6 +303,7 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import { copyToClipboard } from 'quasar';
 
 export default {
   name: 'EntryLayout',
@@ -367,6 +395,23 @@ export default {
       'fetchIssue',
       'pushIssue',
     ]),
+    copyToClipboard: copyToClipboard,
+    nicePop() {
+      window.open(
+        `https://m.nicebizinfo.com/ep/EP0100M001GE.nice?itgSrch=${this.entry.orthForm}`,
+        'popup',
+        'width=900,height=600',
+      );
+      return false;
+    },
+    dailyPop() {
+      window.open(
+        `http://find.mk.co.kr/new/search.php?page=total&&s_keyword=${this.entry.orthForm}`,
+        'popup',
+        'width=900,height=600',
+      );
+      return false;
+    },
     push(path) {
       if (!this.entry.needCheck && !this.semValid) {
         this.dialog('범주 분류가 유효하지 않습니다.');

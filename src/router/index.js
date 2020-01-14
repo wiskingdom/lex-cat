@@ -2,7 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Login from '../views/Login.vue';
 import MainLayout from '../layouts/MainLayout.vue';
-//import MainAbout from '../views/MainAbout.vue';
+import MainAbout from '../views/MainAbout.vue';
 import EntryLayout from '../layouts/EntryLayout.vue';
 //import fireapp from '@/fireapp';
 // const db = fireapp.database();
@@ -29,6 +29,14 @@ const routes = [
     name: 'main',
     component: MainLayout,
     children: [
+      {
+        path: '/',
+        redirect: '/main/about',
+      },
+      {
+        path: 'about',
+        component: MainAbout,
+      },
       {
         path: ':entryId',
         component: EntryLayout,
