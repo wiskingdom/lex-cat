@@ -113,6 +113,10 @@
                 <q-badge :color="`${item.stageColor}`">{{
                   item.stageText
                 }}</q-badge
+                ><q-badge
+                  :color="`${item.issueColor}`"
+                  v-show="item.issueText"
+                  >{{ item.issueText }}</q-badge
                 ><q-space />
                 <q-badge
                   outline
@@ -208,6 +212,7 @@ export default {
     ...mapActions([
       'fetchDomainNames',
       'fetchUserContext',
+      'fetchRoles',
       'fetchUsers',
       'pickTheUserId',
       'pickTheDomain',
@@ -233,7 +238,11 @@ export default {
   },
 
   created() {
-    Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(() => {
+    Promise.all([
+      this.fetchDomainNames(),
+      this.fetchUserContext(),
+      this.fetchRoles(),
+    ]).then(() => {
       Promise.all([
         this.pickTheUserId(this.$auth.currentUser.email),
         this.pickTheDomain(this.defaultDomain),

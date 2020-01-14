@@ -26,15 +26,15 @@ const routes = [
   },
   {
     path: '/main',
-    name: 'main',
     component: MainLayout,
     children: [
       {
         path: '/',
-        redirect: '/main/about',
+        redirect: 'about',
       },
       {
         path: 'about',
+        name: 'about',
         component: MainAbout,
       },
       {

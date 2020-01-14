@@ -17,6 +17,14 @@
             class="text-bold"
             color="grey-8"
             unelevated
+            label="네이버"
+            style="margin-left: 10px"
+            @click="naverPop()"
+          />
+          <q-btn
+            class="text-bold"
+            color="grey-8"
+            unelevated
             label="매일경제"
             style="margin-left: 10px"
             @click="dailyPop()"
@@ -57,13 +65,28 @@
         <span class=" ej text-dark">{{ entry.description }}</span>
         <span class=" ej text-dark" v-show="!entry.description">없음</span>
       </p>
-      <!--
+      <!-- issue -->
       <p>
         <span class=" sect text-blue-8 text-bold">이슈</span>
-        <q-btn flat round dense icon="add" @click="pushIssue" />
       </p>
-      -->
+      <div class="q-pa-md q-gutter-sm">
+        <q-card
+          class="bg-grey-2 my-card"
+          flat
+          bordered
+          v-for="(item, index) in Object.values(issue.messages)"
+          :key="`issue${index}`"
+        >
+          <q-card-section v-html="item.text" v-if="item.text" />
+          <q-card-section align="right">
+            <span v-if="item.sender">{{ item.sender }}</span>
+          </q-card-section>
+        </q-card>
+      </div>
 
+      <div style="min-height:50px"></div>
+
+      <!-- merge dialog-->
       <q-dialog
         v-model="mergPop"
         transition-show="scale"
@@ -110,7 +133,7 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <!-- search -->
+      <!-- search dialog-->
       <q-dialog v-model="searchPop">
         <q-card>
           <q-card-section>
@@ -243,10 +266,17 @@
         <div>SEM CODE</div>
       </q-bar>
       <div style="min-height:160px">
-        <span :class="semTagColor()" style="padding: 10px">{{
-          `[${currentSemTag.value}] ${currentSemTag.tag}`
-        }}</span>
-        <q-input :value="entry.sem" label="Input Code" @input="changeSem" />
+        <p>
+          <span :class="semTagColor()" style="padding: 10px">{{
+            `[${currentSemTag.value}] ${currentSemTag.tag}`
+          }}</span>
+        </p>
+        <q-input
+          dense
+          :value="entry.sem"
+          label="Input Code"
+          @input="changeSem"
+        />
         <p></p>
         <q-btn
           outline
@@ -273,29 +303,54 @@
         />
       </q-bar>
 
-      <p>
-        <span
+      <ul style="list-style-type:none; padding-left: 15px;">
+        <li
           :class="{
             'text-bold': item === entry.orthForm,
           }"
+          v-show="Object.keys(syns).length > 1"
           v-for="(item, index) in syns"
           :key="index"
-          >{{ item }}<br
-        /></span>
-      </p>
+        >
+          {{ item }}
+        </li>
+      </ul>
+
       <q-bar dense class="bg-grey-4 text-black text-bold">
         <div>Extra Syns</div>
       </q-bar>
       <q-form @submit="addExSyn">
         <q-input dense v-model="extraSyn" label="Input Extra Syn" />
       </q-form>
-      <div
-        v-for="(key, item) in entry.extraSyns"
-        :key="key"
-        class="q-gutter-xs"
-      >
-        <span>{{ item }} </span
-        ><q-btn dense flat unelevated icon="clear" @click="removeExSyn(item)" />
+      <ul style="list-style-type:none; padding-left: 15px;">
+        <li
+          v-for="(key, item) in entry.extraSyns"
+          :key="key"
+          class="q-gutter-xs"
+        >
+          <span>{{ item }} </span
+          ><q-btn
+            dense
+            unelevated
+            size="8px"
+            color="deep-orange"
+            icon="clear"
+            style="margin: 5px 5px"
+            @click="removeExSyn(item)"
+          />
+        </li>
+      </ul>
+      <q-bar dense class="bg-grey-4 text-black text-bold">
+        <div>ISSUE</div>
+      </q-bar>
+      <div class="row">
+        <q-btn flat round dense icon="add" @click="pushIssuHandle" />
+        <q-editor
+          v-model="editor"
+          min-height="5rem"
+          style="width: 80%; max-width: 600px"
+          :toolbar="[['bold', 'italic', 'strike', 'underline']]"
+        />
       </div>
     </div>
   </div>
@@ -315,6 +370,7 @@ export default {
       searchPop: false,
       searchTerm: '',
       extraSyn: '',
+      editor: '',
     };
   },
 
@@ -369,6 +425,7 @@ export default {
       'fetchDomainNames',
       'fetchUserContext',
       'fetchUsers',
+      'fetchRoles',
       'pickTheUserId',
       'pickTheDomain',
       'fetchLabels',
@@ -381,7 +438,6 @@ export default {
       'fetchEntry',
       'fetchSynset',
       'fetchMergingSynset',
-      'fetchIssue',
       'updateSynset',
       'changeSkip',
       'changeNeedCheck',
@@ -396,20 +452,32 @@ export default {
       'pushIssue',
     ]),
     copyToClipboard: copyToClipboard,
+    pushIssuHandle() {
+      this.pushIssue({
+        sender: this.$auth.currentUser.email,
+        text: this.editor
+          .trim()
+          .replace(/(<div><br><\/div>)+/g, '<div><br></div>')
+          .replace(/(<div><br><\/div>)$/, ''),
+      });
+      this.editor = '';
+    },
+    naverPop() {
+      const link = `https://m.search.naver.com/search.naver?where=m_news&sm=mtb_jum&query=${this.entry.orthForm}`;
+      const linkUri = encodeURI(link);
+      window.open(linkUri, 'popup', 'width=900,height=900');
+      return false;
+    },
     nicePop() {
-      window.open(
-        `https://m.nicebizinfo.com/ep/EP0100M001GE.nice?itgSrch=${this.entry.orthForm}`,
-        'popup',
-        'width=900,height=600',
-      );
+      const link = `https://m.nicebizinfo.com/ep/EP0100M001GE.nice?itgSrch=${this.entry.orthForm}`;
+      const linkUri = encodeURI(link);
+      window.open(linkUri, 'popup', 'width=900,height=900');
       return false;
     },
     dailyPop() {
-      window.open(
-        `http://find.mk.co.kr/new/search.php?page=total&&s_keyword=${this.entry.orthForm}`,
-        'popup',
-        'width=900,height=600',
-      );
+      const link = `http://find.mk.co.kr/new/search.php?page=total&&s_keyword=${this.entry.orthForm}#`;
+      const linkUri = encodeURI(link);
+      window.open(linkUri, 'popup', 'width=900,height=900');
       return false;
     },
     push(path) {
@@ -494,6 +562,7 @@ export default {
           this.fetchSynset();
         });
         this.fetchSimilars();
+        this.fetchIssue();
         this.pickTheEntryId(entryId);
         const worksetId = entryId
           .split('-')
@@ -503,17 +572,19 @@ export default {
       });
     },
     allFetch() {
-      Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(
-        () => {
-          this.pickTheUserId(this.currentUserEmail);
-          this.pickTheDomain(this.defaultDomain).then(() => {
-            this.fetchUsers();
-            this.fetchLabels();
-            this.syncWorksets();
-            this.fetch();
-          });
-        },
-      );
+      Promise.all([
+        this.fetchDomainNames(),
+        this.fetchUserContext(),
+        this.fetchRoles(),
+      ]).then(() => {
+        this.pickTheUserId(this.currentUserEmail);
+        this.pickTheDomain(this.defaultDomain).then(() => {
+          this.fetchUsers();
+          this.fetchLabels();
+          this.syncWorksets();
+          this.fetch();
+        });
+      });
     },
   },
 

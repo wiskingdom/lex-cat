@@ -42,6 +42,15 @@ const fetchUsers = ({ state, commit }) =>
         resolve();
       });
   });
+const fetchRoles = ({ commit }) =>
+  new Promise(resolve => {
+    db.ref('/app/roles')
+      .once('value')
+      .then(snap => {
+        commit('ROLES', snap.val());
+        resolve();
+      });
+  });
 
 const fetchLabels = ({ state, commit }) =>
   new Promise(resolve => {
@@ -99,7 +108,11 @@ const initEntry = ({ commit }) => {
   commit('SIMILARS', {});
   commit('ENTRY', {});
   commit('SYNSET', {});
-  commit('ISSUE', {});
+  commit('ISSUE', {
+    isImportant: false,
+    isClosed: false,
+    messages: {},
+  });
 };
 
 const fetchSimilars = ({ state, commit }) => {
@@ -263,18 +276,44 @@ const fetchIssue = ({ state, commit }) => {
     } else {
       commit('ISSUE', {
         isImportant: false,
-        messages: [],
+        isClosed: false,
+        messages: {},
       });
     }
   });
 };
-const pushIssue = ({ state, commit }, { sender, text }) => {
-  const ref = db.ref(
-    `/dict/${state.theDomain}/issues/${state.theEntryId}/messages`,
-  );
-  ref.push({ sender, text });
-  commit('ISSUE_MESSAGES', { sender, text });
+const getIssueCode = role => messages => {
+  const cntMessages = messages.length;
+  const lastSender = messages[length - 1] ? messages[length - 1].sender : '';
+  const lastSenderCode = role.includes(lastSender);
+  if (cntMessages) {
+    if (lastSenderCode) {
+      return 2;
+    } else {
+      return 1;
+    }
+  } else {
+    return 0;
+  }
 };
+const pushIssue = ({ state, commit }, { sender, text }) =>
+  new Promise(resolve => {
+    if (text.split('').length > 4) {
+      const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
+      const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}/messages`);
+      const newKey = ref.push().key;
+      ref.child(newKey).set({ sender, text });
+      commit('ISSUE_MESSAGES', { newKey, sender, text });
+      const messages = Object.values(issue.messages);
+      const issueProcess = getIssueCode(roles.supervisor)(messages);
+
+      commit('ISSUE_CODE', issueProcess);
+      db.ref(
+        `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+      ).update({ issueProcess });
+      resolve();
+    }
+  });
 
 const changeSkip = ({ commit }, isSkipped) =>
   new Promise(resolve => {
@@ -354,14 +393,15 @@ export {
   fetchDomainNames,
   fetchUserContext,
   fetchUsers,
+  fetchRoles, // new
   pickTheUserId,
   pickTheDomain,
   fetchLabels,
   syncSummary,
-  syncWorksets, // 'syncWorksetStates',
+  syncWorksets,
   pickTheWorksetId,
-  initEntryMarkings, // 'initEntryStates',
-  fetchEntryMarkings, // 'syncEntryStates',
+  initEntryMarkings,
+  fetchEntryMarkings,
   pickTheEntryId,
   // entrywork
   fetchSimilars,
@@ -376,7 +416,7 @@ export {
   changePos,
   changeSem,
   changeExtraSyns,
-  updateEntry, //'updateEntryLabels',
+  updateEntry,
   updateStageCode,
   updateHasExtraSyns,
   initEntry,

@@ -42,12 +42,32 @@ const entryIndex = state => {
         return 'warning';
       }
     };
+    const getIssueText = issueCode => {
+      if (issueCode === 0) {
+        return '';
+      } else if (issueCode === 1) {
+        return '신고';
+      } else {
+        return '답변';
+      }
+    };
+    const getIssueColor = issueCode => {
+      if (issueCode === 0) {
+        return '';
+      } else if (issueCode === 1) {
+        return 'deep-orange-8';
+      } else {
+        return 'indigo-8';
+      }
+    };
     const getHasSynsetText = bool => (bool ? 'syn' : '');
     const getHasExtraSynsText = bool => (bool ? 'exSyn' : '');
     const stageText = getStageText(stage);
     const stageColor = getStageColor(stage);
     const hasSynsetText = getHasSynsetText(hasSynset);
     const hasExtraSynsText = getHasExtraSynsText(hasExtraSyns);
+    const issueText = getIssueText(issueProcess);
+    const issueColor = getIssueColor(issueProcess);
     return {
       label,
       value,
@@ -55,7 +75,8 @@ const entryIndex = state => {
       stageText,
       hasSynsetText,
       hasExtraSynsText,
-      issueProcess,
+      issueText,
+      issueColor,
     };
   });
 };

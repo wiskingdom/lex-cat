@@ -8,6 +8,9 @@ export default {
   },
   theDomain: '',
   users: [],
+  roles: {
+    supervisor: [''],
+  },
   theUserId: '',
   // entrywork
   labels: {
@@ -43,6 +46,7 @@ export default {
   mergingSynsetId: '',
   issue: {
     isImportant: false,
+    isClosed: false,
     messages: [],
   },
 };

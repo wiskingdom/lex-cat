@@ -10,6 +10,9 @@ const THE_DOMAIN = (state, payload) => {
 const USERS = (state, payload) => {
   state.users = payload;
 };
+const ROLES = (state, payload) => {
+  state.roles = payload;
+};
 const THE_USER_ID = (state, payload) => {
   state.theUserId = payload;
 };
@@ -32,6 +35,9 @@ const ENTRY_MARKINGS = (state, payload) => {
 
 const STAGE_CODE = (state, payload) => {
   state.entryMarkings[state.theEntryId].stage = payload;
+};
+const ISSUE_CODE = (state, payload) => {
+  state.entryMarkings[state.theEntryId].issueProcess = payload;
 };
 const THE_ENTRY_ID = (state, payload) => {
   state.theEntryId = payload;
@@ -81,8 +87,8 @@ const HAS_SYNSET = (state, payload) => {
 const HAS_EXTRA_SYNS = (state, payload) => {
   state.entryMarkings[state.theEntryId].hasExtraSyns = payload;
 };
-const ISSUE_MESSAGES = (state, { sender, text }) => {
-  state.issue.messages.push({ sender, text });
+const ISSUE_MESSAGES = (state, { newKey, sender, text }) => {
+  state.issue.messages[newKey] = { sender, text };
 };
 
 export {
@@ -90,6 +96,7 @@ export {
   USER_CONTEXT,
   THE_DOMAIN,
   USERS,
+  ROLES,
   THE_USER_ID,
   LABELS,
   SUMMARY,
@@ -114,4 +121,5 @@ export {
   HAS_SYNSET,
   HAS_EXTRA_SYNS,
   ISSUE_MESSAGES,
+  ISSUE_CODE,
 };
