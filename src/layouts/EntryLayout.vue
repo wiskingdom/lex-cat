@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col q-gutter-md" style="padding: 10px 20px;">
       <p>
-        <span class="entry text-dark text-bold">{{ superEntry.orthForm }}</span>
+        <span class="entry text-dark text-bold">{{ entry.orthForm }}</span>
       </p>
       <p>
         <span class=" sect text-blue-8 text-bold">관련어</span>
@@ -12,11 +12,11 @@
         <span
           class="ej text-dark"
           :class="{
-            'text-blue-8': isSynMember(`${key}-01`),
-            'text-bold': isSynMember(`${key}-01`),
-            'cursor-pointer': !isSynMember(`${key}-01`),
+            'text-blue-8': isSynMember(`${key}`),
+            'text-bold': isSynMember(`${key}`),
+            'cursor-pointer': !isSynMember(`${key}`),
           }"
-          @click="mergeReady(`${key}-01`)"
+          @click="mergeReady(`${key}`)"
           v-for="(item, key) in similars"
           v-show="item !== entry.orthForm"
           :key="key"
@@ -27,9 +27,15 @@
         <span class=" sect text-blue-8 text-bold">정의</span>
       </p>
       <p>
-        <span class=" ej text-dark">{{ superEntry.description }}</span>
-        <span class=" ej text-dark" v-show="!superEntry.description">없음</span>
+        <span class=" ej text-dark">{{ entry.description }}</span>
+        <span class=" ej text-dark" v-show="!entry.description">없음</span>
       </p>
+      <!--
+      <p>
+        <span class=" sect text-blue-8 text-bold">이슈</span>
+        <q-btn flat round dense icon="add" @click="pushIssue" />
+      </p>
+      -->
 
       <q-dialog
         v-model="mergPop"
@@ -58,7 +64,6 @@
                   <span>+</span>
                 </td>
                 <td>
-                  <span v-show="!syns.length">{{ entry.orthForm }}</span>
                   <span v-for="(item, index) in syns" :key="`syn-${index}`"
                     >{{ item }}<br
                   /></span>
@@ -95,11 +100,11 @@
               <span
                 class="ej text-dark"
                 :class="{
-                  'text-blue-8': isSynMember(`${key}-01`),
-                  'text-bold': isSynMember(`${key}-01`),
-                  'cursor-pointer': !isSynMember(`${key}-01`),
+                  'text-blue-8': isSynMember(`${key}`),
+                  'text-bold': isSynMember(`${key}`),
+                  'cursor-pointer': !isSynMember(`${key}`),
                 }"
-                @click="mergeReady(`${key}-01`)"
+                @click="mergeReady(`${key}`)"
                 v-for="(item, key) in searchedSimilar"
                 v-show="item !== entry.orthForm"
                 :key="key"
@@ -251,6 +256,20 @@
           >{{ item }}<br
         /></span>
       </p>
+      <q-bar dense class="bg-grey-4 text-black text-bold">
+        <div>Extra Syns</div>
+      </q-bar>
+      <q-form @submit="addExSyn">
+        <q-input dense v-model="extraSyn" label="Input Extra Syn" />
+      </q-form>
+      <div
+        v-for="(key, item) in entry.extraSyns"
+        :key="key"
+        class="q-gutter-xs"
+      >
+        <span>{{ item }} </span
+        ><q-btn dense flat unelevated icon="clear" @click="removeExSyn(item)" />
+      </div>
     </div>
   </div>
 </template>
@@ -267,6 +286,7 @@ export default {
       mergPop: false,
       searchPop: false,
       searchTerm: '',
+      extraSyn: '',
     };
   },
 
@@ -284,8 +304,6 @@ export default {
       'mergingSynsetId',
       'issue',
       'labels',
-      'syns',
-      'mergingSyns',
     ]),
     ...mapGetters([
       'theSuperNum',
@@ -299,9 +317,10 @@ export default {
       'semValid',
       'semIsIn',
       'entryIndex',
-      'syns',
       'isSynMember',
       'stageCode',
+      'syns',
+      'mergingSyns',
     ]),
   },
   watch: {
@@ -343,7 +362,10 @@ export default {
       'changeExtraSyns', // 신규
       'updateEntry',
       'updateStageCode',
+      'updateHasExtraSyns',
       'initEntry',
+      'fetchIssue',
+      'pushIssue',
     ]),
     push(path) {
       if (!this.entry.needCheck && !this.semValid) {
@@ -351,7 +373,10 @@ export default {
       } else {
         this.$router.push(path);
       }
-      this.updateStageCode(this.stageCode).then(this.updateEntry());
+      Promise.all([
+        this.updateStageCode(this.stageCode),
+        this.updateHasExtraSyns(),
+      ]).then(this.updateEntry());
     },
     offSearch() {
       this.searchPop = false;
@@ -386,11 +411,23 @@ export default {
         return 'bg-yellow-2';
       }
     },
+    addExSyn() {
+      if (this.extraSyn) {
+        this.changeExtraSyns({ syn: this.extraSyn, type: 'add' });
+      }
+      this.extraSyn = '';
+    },
+    removeExSyn(syn) {
+      this.changeExtraSyns({ syn, type: 'delete' });
+    },
     update() {
       if (!this.entry.needCheck && !this.entry.isSkipped && !this.semValid) {
         this.dialog('범주 분류가 유효하지 않습니다.');
       }
-      this.updateStageCode(this.stageCode).then(this.updateEntry());
+      Promise.all([
+        this.updateStageCode(this.stageCode),
+        this.updateHasExtraSyns(),
+      ]).then(this.updateEntry());
     },
     mergeReady(key) {
       if (!this.synset) {

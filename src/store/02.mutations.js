@@ -75,6 +75,15 @@ const MERGING_SYNSET_ID = (state, payload) => {
 const ISSUE = (state, payload) => {
   state.issue = payload;
 };
+const HAS_SYNSET = (state, payload) => {
+  state.entryMarkings[state.theEntryId].hasSynset = payload;
+};
+const HAS_EXTRA_SYNS = (state, payload) => {
+  state.entryMarkings[state.theEntryId].hasExtraSyns = payload;
+};
+const ISSUE_MESSAGES = (state, { sender, text }) => {
+  state.issue.messages.push({ sender, text });
+};
 
 export {
   DOMAIN_NAMES,
@@ -102,4 +111,7 @@ export {
   MERGING_SYNSET_ID,
   ISSUE,
   STAGE_CODE,
+  HAS_SYNSET,
+  HAS_EXTRA_SYNS,
+  ISSUE_MESSAGES,
 };

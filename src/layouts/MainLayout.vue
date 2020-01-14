@@ -112,7 +112,20 @@
                 {{ item.label }}
                 <q-badge :color="`${item.stageColor}`">{{
                   item.stageText
-                }}</q-badge>
+                }}</q-badge
+                ><q-space />
+                <q-badge
+                  outline
+                  color="secondary"
+                  v-show="item.hasSynsetText"
+                  >{{ item.hasSynsetText }}</q-badge
+                >
+                <q-badge
+                  outline
+                  color="grey-8"
+                  v-show="item.hasExtraSynsText"
+                  >{{ item.hasExtraSynsText }}</q-badge
+                >
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -172,7 +185,12 @@ export default {
       'theUserId',
       'theWorksetId',
     ]),
-    ...mapGetters(['defaultDomain', 'worksetIndex', 'entryIndex']),
+    ...mapGetters([
+      'defaultDomain',
+      'worksetIndex',
+      'entryIndex',
+      'annotatorCode',
+    ]),
   },
   watch: {
     theDomain() {
@@ -216,17 +234,19 @@ export default {
 
   created() {
     Promise.all([this.fetchDomainNames(), this.fetchUserContext()]).then(() => {
-      this.pickTheUserId(this.$auth.currentUser.email);
-      this.pickTheDomain(this.defaultDomain).then(() => {
-        this.fetchUsers();
+      Promise.all([
+        this.pickTheUserId(this.$auth.currentUser.email),
+        this.pickTheDomain(this.defaultDomain),
+        this.fetchUsers(),
+      ]).then(() => {
         this.fetchLabels();
-        this.syncWorksetStates();
+        this.syncWorksets();
       });
     });
   },
   beforeDestroy() {
     //this.$auth.signOut();
-
+    this.pickTheDomain('');
     this.pickTheUserId('');
     this.pickTheWorksetId('');
     this.initEntryMarkings();

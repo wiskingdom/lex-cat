@@ -35,11 +35,14 @@ export default {
     pos: '',
     sem: '',
     synOf: '',
-    extraSyns: [],
+    extraSyns: {},
     updatedBy: '',
   },
   synset: {},
   mergingSynset: {},
   mergingSynsetId: '',
-  issue: {},
+  issue: {
+    isImportant: false,
+    messages: [],
+  },
 };

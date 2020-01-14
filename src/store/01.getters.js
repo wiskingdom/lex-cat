@@ -18,7 +18,7 @@ const entryIndex = state => {
     return [];
   }
   return Object.entries(state.entryMarkings).map(([value, features]) => {
-    const { hasSynset, issueProcess, stage, orthForm } = features;
+    const { hasSynset, issueProcess, stage, orthForm, hasExtraSyns } = features;
     const label = orthForm;
     const getStageText = stageCode => {
       if (stageCode === 0) {
@@ -42,9 +42,21 @@ const entryIndex = state => {
         return 'warning';
       }
     };
+    const getHasSynsetText = bool => (bool ? 'syn' : '');
+    const getHasExtraSynsText = bool => (bool ? 'exSyn' : '');
     const stageText = getStageText(stage);
     const stageColor = getStageColor(stage);
-    return { label, value, stageColor, stageText, hasSynset, issueProcess };
+    const hasSynsetText = getHasSynsetText(hasSynset);
+    const hasExtraSynsText = getHasExtraSynsText(hasExtraSyns);
+    return {
+      label,
+      value,
+      stageColor,
+      stageText,
+      hasSynsetText,
+      hasExtraSynsText,
+      issueProcess,
+    };
   });
 };
 
@@ -87,8 +99,8 @@ const semValid = state => {
 const semIsIn = state => {
   return Object.keys(state.labels.sem).includes(state.entry.sem);
 };
-const syns = state => Object.keys(state.synset) || [];
-const mergingSyns = state => Object.keys(state.mergingSynset) || [];
+const syns = state => Object.values(state.synset) || [];
+const mergingSyns = state => Object.values(state.mergingSynset) || [];
 const isSynMember = state => key => {
   const synset = state.synset ? state.synset : {};
   return !!synset[key];
