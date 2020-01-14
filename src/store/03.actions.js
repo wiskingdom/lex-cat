@@ -325,16 +325,18 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
 const onoffIssue = ({ state, commit }, isClosed) =>
   new Promise(resolve => {
     const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
-    const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}`);
-    ref.update({ isClosed });
-    commit('IS_CLOSED', isClosed);
-    const issueProcess = getIssueCode(roles.supervisor)(issue);
+    if (Object.values(issue.messages > 0)) {
+      const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}`);
+      ref.update({ isClosed });
+      commit('IS_CLOSED', isClosed);
+      const issueProcess = getIssueCode(roles.supervisor)(issue);
 
-    db.ref(
-      `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
-    ).update({ issueProcess });
-    commit('ISSUE_CODE', issueProcess);
-    resolve();
+      db.ref(
+        `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+      ).update({ issueProcess });
+      commit('ISSUE_CODE', issueProcess);
+      resolve();
+    }
   });
 
 const changeSkip = ({ commit }, isSkipped) =>

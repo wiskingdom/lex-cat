@@ -350,6 +350,7 @@
           left-label
           text-color="primary"
           color="grey-8"
+          v-show="Object.values(issue.messages).length > 0"
           :value="issue.isClosed"
           @input="onoffIssue"
           label="닫음"
