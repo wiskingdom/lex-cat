@@ -47,8 +47,10 @@ const entryIndex = state => {
         return '';
       } else if (issueCode === 1) {
         return '신고';
-      } else {
+      } else if (issueCode === 2) {
         return '답변';
+      } else {
+        return '닫음';
       }
     };
     const getIssueColor = issueCode => {
@@ -56,8 +58,10 @@ const entryIndex = state => {
         return '';
       } else if (issueCode === 1) {
         return 'deep-orange-8';
-      } else {
+      } else if (issueCode === 2) {
         return 'indigo-8';
+      } else {
+        return 'grey-8';
       }
     };
     const getHasSynsetText = bool => (bool ? 'syn' : '');

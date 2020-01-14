@@ -90,6 +90,9 @@ const HAS_EXTRA_SYNS = (state, payload) => {
 const ISSUE_MESSAGES = (state, { newKey, sender, text }) => {
   state.issue.messages[newKey] = { sender, text };
 };
+const IS_CLOSED = (state, payload) => {
+  state.issue.isClosed = payload;
+};
 
 export {
   DOMAIN_NAMES,
@@ -122,4 +125,5 @@ export {
   HAS_EXTRA_SYNS,
   ISSUE_MESSAGES,
   ISSUE_CODE,
+  IS_CLOSED,
 };

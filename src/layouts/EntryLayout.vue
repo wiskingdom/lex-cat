@@ -342,6 +342,18 @@
       </ul>
       <q-bar dense class="bg-grey-4 text-black text-bold">
         <div>ISSUE</div>
+        <q-space />
+        <q-checkbox
+          dense
+          flat
+          size="md"
+          left-label
+          text-color="primary"
+          color="grey-8"
+          :value="issue.isClosed"
+          @input="onoffIssue"
+          label="닫음"
+        />
       </q-bar>
       <div class="row">
         <q-btn flat round dense icon="add" @click="pushIssuHandle" />
@@ -450,6 +462,7 @@ export default {
       'initEntry',
       'fetchIssue',
       'pushIssue',
+      'onoffIssue',
     ]),
     copyToClipboard: copyToClipboard,
     pushIssuHandle() {

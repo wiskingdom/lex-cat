@@ -272,7 +272,12 @@ const fetchIssue = ({ state, commit }) => {
   const ref = db.ref(`/dict/${state.theDomain}/issues/${state.theEntryId}`);
   ref.once('value', snap => {
     if (snap.exists()) {
-      commit('ISSUE', snap.val());
+      const { isImportant, isClosed, messages } = snap.val();
+      commit('ISSUE', {
+        isImportant: !!isImportant,
+        isClosed: !!isClosed,
+        messages,
+      });
     } else {
       commit('ISSUE', {
         isImportant: false,
@@ -282,12 +287,16 @@ const fetchIssue = ({ state, commit }) => {
     }
   });
 };
-const getIssueCode = role => messages => {
-  const cntMessages = messages.length;
-  const lastSender = messages[length - 1] ? messages[length - 1].sender : '';
+const getIssueCode = role => issue => {
+  const cntMessages = Object.values(issue.messages).length;
+  const lastSender = Object.values(issue.messages)[length - 1]
+    ? issue.messages[length - 1].sender
+    : '';
   const lastSenderCode = role.includes(lastSender);
   if (cntMessages) {
-    if (lastSenderCode) {
+    if (issue.isClosed) {
+      return 3;
+    } else if (lastSenderCode) {
       return 2;
     } else {
       return 1;
@@ -304,8 +313,7 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
       const newKey = ref.push().key;
       ref.child(newKey).set({ sender, text });
       commit('ISSUE_MESSAGES', { newKey, sender, text });
-      const messages = Object.values(issue.messages);
-      const issueProcess = getIssueCode(roles.supervisor)(messages);
+      const issueProcess = getIssueCode(roles.supervisor)(issue);
 
       commit('ISSUE_CODE', issueProcess);
       db.ref(
@@ -313,6 +321,20 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
       ).update({ issueProcess });
       resolve();
     }
+  });
+const onoffIssue = ({ state, commit }, isClosed) =>
+  new Promise(resolve => {
+    const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
+    const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}`);
+    ref.update({ isClosed });
+    commit('IS_CLOSED', isClosed);
+    const issueProcess = getIssueCode(roles.supervisor)(issue);
+
+    db.ref(
+      `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+    ).update({ issueProcess });
+    commit('ISSUE_CODE', issueProcess);
+    resolve();
   });
 
 const changeSkip = ({ commit }, isSkipped) =>
@@ -421,4 +443,5 @@ export {
   updateHasExtraSyns,
   initEntry,
   pushIssue,
+  onoffIssue,
 };
