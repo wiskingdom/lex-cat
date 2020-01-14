@@ -19,7 +19,7 @@
 
         <div v-show="theUserId">
           <q-icon :name="selectedMood" />
-          {{ theUserId }}
+          {{ $auth.currentUser.email }}
         </div>
         <q-btn
           color="primary"
