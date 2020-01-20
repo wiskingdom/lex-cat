@@ -23,6 +23,7 @@ export default {
     users: {},
   },
   worksets: {},
+  worksetsRef: '',
   theWorksetId: '',
   entryMarkings: {},
   theEntryId: '',

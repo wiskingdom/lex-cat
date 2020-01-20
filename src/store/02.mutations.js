@@ -26,6 +26,9 @@ const SUMMARY = (state, payload) => {
 const WORKSETS = (state, payload) => {
   state.worksets = payload;
 };
+const WORKSETS_REF = (state, payload) => {
+  state.worksetsRef = payload;
+};
 const THE_WORKSET_ID = (state, payload) => {
   state.theWorksetId = payload;
 };
@@ -107,6 +110,7 @@ export {
   LABELS,
   SUMMARY,
   WORKSETS,
+  WORKSETS_REF,
   THE_WORKSET_ID,
   ENTRY_MARKINGS,
   THE_ENTRY_ID,

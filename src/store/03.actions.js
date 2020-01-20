@@ -70,8 +70,19 @@ const syncWorksets = ({ state, commit }) => {
     .equalTo(annotatorCode);
   ref.on('value', snap => {
     commit('WORKSETS', snap.val());
+    commit('WORKSETS_REF', ref);
   });
 };
+const unsyncWorksets = ({ state }) =>
+  new Promise(resolve => {
+    const { worksetsRef } = state;
+    if (worksetsRef) {
+      worksetsRef.off();
+      resolve();
+    } else {
+      resolve();
+    }
+  });
 
 const pickTheWorksetId = ({ commit }, worksetId) =>
   new Promise(resolve => {
@@ -431,6 +442,7 @@ export {
   fetchLabels,
   syncSummary,
   syncWorksets,
+  unsyncWorksets,
   pickTheWorksetId,
   initEntryMarkings,
   fetchEntryMarkings,

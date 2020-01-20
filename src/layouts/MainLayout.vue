@@ -222,11 +222,11 @@ export default {
   },
   watch: {
     theDomain() {
-      this.syncWorksets();
+      this.unsyncWorksets().then(this.syncWorksets());
       this.pickTheWorksetId('');
     },
     theUserId() {
-      this.syncWorksets();
+      this.unsyncWorksets().then(this.syncWorksets());
       this.pickTheWorksetId('');
     },
     theWorksetId() {
@@ -245,6 +245,7 @@ export default {
       'fetchLabels',
       'syncSummary',
       'syncWorksets',
+      'unsyncWorksets',
       'pickTheWorksetId',
       'initEntryMarkings',
       'fetchEntryMarkings',
