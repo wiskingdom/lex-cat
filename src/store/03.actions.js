@@ -326,7 +326,7 @@ const getIssueCode = role => issue => {
 };
 const pushIssue = ({ state, commit }, { sender, text }) =>
   new Promise(resolve => {
-    if (text.split('').length > 4) {
+    if (text.replace(/<.+?>/g, '').split('').length > 1) {
       const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
       const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}/messages`);
       const newKey = ref.push().key;
@@ -394,7 +394,7 @@ const changeExtraSyns = ({ state, commit }, { syn, type }) =>
 
 const updateEntry = ({ state, getters }) =>
   new Promise(resolve => {
-    const { isSkipped, needCheck, pos, sem, extraSyns } = state.entry;
+    const { isSkipped, needCheck, pos, sem } = state.entry;
     const ref = db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`);
     if (getters.semValid) {
       ref.update({
@@ -405,7 +405,6 @@ const updateEntry = ({ state, getters }) =>
     ref.update({
       isSkipped,
       needCheck,
-      extraSyns,
       updatedBy: auth.currentUser.email,
     });
     resolve();
@@ -419,7 +418,7 @@ const updateStageCode = ({ state, commit }, stage) =>
     ).update({ stage });
     resolve();
   });
-const updateHasExtraSyns = ({ state, commit }) =>
+const updateExtraSyns = ({ state, commit }) =>
   new Promise(resolve => {
     const { theWorksetId, theEntryId, entry } = state;
     const { extraSyns } = entry;
@@ -428,6 +427,9 @@ const updateHasExtraSyns = ({ state, commit }) =>
     db.ref(
       `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
     ).update({ hasExtraSyns });
+    db.ref(`/dict/${state.theDomain}/entries/${theEntryId}`).update({
+      extraSyns,
+    });
     resolve();
   });
 
@@ -462,7 +464,7 @@ export {
   changeExtraSyns,
   updateEntry,
   updateStageCode,
-  updateHasExtraSyns,
+  updateExtraSyns,
   initEntry,
   pushIssue,
   onoffIssue,

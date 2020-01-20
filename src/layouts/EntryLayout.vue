@@ -186,7 +186,7 @@
     <!-- right side -->
     <div
       class="col-4 col-md-4 q-gutter-md"
-      style="padding: 0px; border-left: 1px solid LightGray; min-width: 380px"
+      style="padding: 0px; border-left: 1px solid LightGray; min-width: 390px"
     >
       <q-btn
         dense
@@ -276,31 +276,40 @@
       <q-bar dense class="bg-grey-4 text-black text-bold">
         <div>SEM CODE</div>
       </q-bar>
-      <div style="min-height:160px">
-        <p>
-          <span :class="semTagColor()" style="padding: 10px">{{
-            `[${currentSemTag.value}] ${currentSemTag.tag}`
-          }}</span>
-        </p>
-        <q-input
-          dense
-          :value="entry.sem"
-          label="Input Code"
-          @input="changeSem"
-        />
-        <p></p>
-        <q-btn
-          outline
-          flat
-          size="13px"
-          v-ripple
-          v-for="item in semHints"
-          :label="item.tag"
-          color="grey-8"
-          class="text-blue-8"
-          @click="changeSem(item.value)"
-          :key="`${item.value}`"
-        />
+
+      <p>
+        <span :class="semTagColor()" style="padding: 10px">{{
+          `[${currentSemTag.value}] ${currentSemTag.tag}`
+        }}</span>
+      </p>
+      <q-input dense :value="entry.sem" label="Input Code" @input="changeSem" />
+      <p></p>
+      <div class="row" style="min-height:70px">
+        <div class="col">
+          <q-btn
+            dense
+            unelevated
+            round
+            icon="arrow_upward"
+            size="13px"
+            v-ripple
+            class="text-blue-8"
+            @click="changeSem(`${entry.sem.slice(0, -1)}`)"
+          />
+        </div>
+        <div class="col-11">
+          <q-btn
+            outline
+            flat
+            size="13px"
+            v-ripple
+            v-for="item in semHints"
+            :label="item.tag"
+            color="grey-8"
+            @click="changeSem(item.value)"
+            :key="`${item.value}`"
+          />
+        </div>
       </div>
       <q-bar dense class="bg-grey-4 text-black text-bold">
         <div>Synset</div>
@@ -368,7 +377,14 @@
         />
       </q-bar>
       <div class="row">
-        <q-btn flat round dense icon="add" @click="pushIssuHandle" />
+        <q-btn
+          flat
+          round
+          dense
+          class="text-blue-8"
+          icon="add"
+          @click="pushIssuHandle"
+        />
         <q-editor
           v-model="editor"
           min-height="5rem"
@@ -472,7 +488,7 @@ export default {
       'changeExtraSyns', // 신규
       'updateEntry',
       'updateStageCode',
-      'updateHasExtraSyns',
+      'updateExtraSyns',
       'initEntry',
       'fetchIssue',
       'pushIssue',
@@ -480,12 +496,15 @@ export default {
     ]),
     copyToClipboard: copyToClipboard,
     pushIssuHandle() {
+      const text = this.editor
+        .trim()
+        .replace(/(<div><br><\/div>)+/g, '<div><br></div>')
+        .replace(/(<div><br><\/div>)$/, '')
+        .replace(/^(<div><br><\/div>)/, '')
+        .trim();
       this.pushIssue({
         sender: this.$auth.currentUser.email,
-        text: this.editor
-          .trim()
-          .replace(/(<div><br><\/div>)+/g, '<div><br></div>')
-          .replace(/(<div><br><\/div>)$/, ''),
+        text,
       });
       this.editor = '';
     },
@@ -513,10 +532,9 @@ export default {
       } else {
         this.$router.push(path);
       }
-      Promise.all([
-        this.updateStageCode(this.stageCode),
-        this.updateHasExtraSyns(),
-      ]).then(this.updateEntry());
+      Promise.all([this.updateStageCode(this.stageCode)]).then(
+        this.updateEntry(),
+      );
     },
     offSearch() {
       this.searchPop = false;
@@ -553,21 +571,24 @@ export default {
     },
     addExSyn() {
       if (this.extraSyn) {
-        this.changeExtraSyns({ syn: this.extraSyn, type: 'add' });
+        this.changeExtraSyns({ syn: this.extraSyn, type: 'add' }).then(
+          this.updateExtraSyns(),
+        );
       }
       this.extraSyn = '';
     },
     removeExSyn(syn) {
-      this.changeExtraSyns({ syn, type: 'delete' });
+      this.changeExtraSyns({ syn, type: 'delete' }).then(
+        this.updateExtraSyns(),
+      );
     },
     update() {
       if (!this.entry.needCheck && !this.entry.isSkipped && !this.semValid) {
         this.dialog('범주 분류가 유효하지 않습니다.');
       }
-      Promise.all([
-        this.updateStageCode(this.stageCode),
-        this.updateHasExtraSyns(),
-      ]).then(this.updateEntry());
+      Promise.all([this.updateStageCode(this.stageCode)]).then(
+        this.updateEntry(),
+      );
     },
     mergeReady(key) {
       if (!this.synset) {
