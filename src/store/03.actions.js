@@ -83,12 +83,16 @@ const initEntryMarkings = ({ commit }) => {
   commit('ENTRY_MARKINGS', {});
 };
 const fetchEntryMarkings = ({ state, commit }) => {
-  const ref = db.ref(
-    `/dict/${state.theDomain}/entryMarkings/${state.theWorksetId}`,
-  );
-  ref.once('value', snap => {
-    commit('ENTRY_MARKINGS', snap.val());
-  });
+  if (state.theWorksetId) {
+    const ref = db.ref(
+      `/dict/${state.theDomain}/entryMarkings/${state.theWorksetId}`,
+    );
+    ref.once('value', snap => {
+      commit('ENTRY_MARKINGS', snap.val());
+    });
+  } else {
+    commit('ENTRY_MARKINGS', {});
+  }
 };
 
 const syncSummary = ({ state, commit }) => {
@@ -123,7 +127,7 @@ const fetchSimilars = ({ state, commit }) => {
 };
 
 const fetchSearchedSimilar = ({ state, commit }, string) => {
-  if (string) {
+  if (string.length > 1) {
     const directString = string.toUpperCase().replace(/ -/g, '');
     const ref = db
       .ref(`/dict/${state.theDomain}/entries`)
@@ -139,12 +143,15 @@ const fetchSearchedSimilar = ({ state, commit }, string) => {
           similar[entryId] = theValue[entryId].orthForm;
         });
         commit('SEARCHED_SIMILAR', similar);
+        commit('SEARCHED_MESSAGE', '검색 결과입니다.');
       } else {
         commit('SEARCHED_SIMILAR', {});
+        commit('SEARCHED_MESSAGE', '검색 결과가 없습니다.');
       }
     });
   } else {
     commit('SEARCHED_SIMILAR', {});
+    commit('SEARCHED_MESSAGE', '검색어는 두 글자 이상 입력해주세요.');
   }
 };
 
@@ -288,9 +295,10 @@ const fetchIssue = ({ state, commit }) => {
   });
 };
 const getIssueCode = role => issue => {
-  const cntMessages = Object.values(issue.messages).length;
-  const lastSender = Object.values(issue.messages)[length - 1]
-    ? issue.messages[length - 1].sender
+  const messages = Object.values(issue.messages);
+  const cntMessages = messages.length;
+  const lastSender = messages[cntMessages - 1]
+    ? messages[cntMessages - 1].sender
     : '';
   const lastSenderCode = role.includes(lastSender);
   if (cntMessages) {

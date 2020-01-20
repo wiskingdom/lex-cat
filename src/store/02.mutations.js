@@ -48,6 +48,9 @@ const SIMILARS = (state, payload) => {
 const SEARCHED_SIMILAR = (state, payload) => {
   state.searchedSimilar = payload;
 };
+const SEARCHED_MESSAGE = (state, payload) => {
+  state.searchedMessage = payload;
+};
 const ENTRY = (state, payload) => {
   state.entry = payload;
 };
@@ -109,6 +112,7 @@ export {
   THE_ENTRY_ID,
   SIMILARS,
   SEARCHED_SIMILAR,
+  SEARCHED_MESSAGE,
   ENTRY,
   ENTRY_SYN_OF,
   ENTRY_EXTRA_SYNS,

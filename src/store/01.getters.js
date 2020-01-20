@@ -7,10 +7,24 @@ const worksetIndex = state => {
   }
   return Object.entries(state.worksets).map(([label, features]) => {
     const value = label;
-    const { cntCompletes, cntEntries, cntOpenIssues } = features;
+    const {
+      cntCompletes,
+      cntEntries,
+      cntOpenIssues,
+      cntClosedIssues,
+      cntRepliedIssues,
+    } = features;
     const rate = `${cntCompletes}/${cntEntries}`;
     const allComplete = cntCompletes === cntEntries;
-    return { label, value, rate, allComplete, cntOpenIssues };
+    return {
+      label,
+      value,
+      rate,
+      allComplete,
+      cntOpenIssues,
+      cntClosedIssues,
+      cntRepliedIssues,
+    };
   });
 };
 const entryIndex = state => {
@@ -48,7 +62,7 @@ const entryIndex = state => {
       } else if (issueCode === 1) {
         return '신고';
       } else if (issueCode === 2) {
-        return '답변';
+        return '요청';
       } else {
         return '닫음';
       }

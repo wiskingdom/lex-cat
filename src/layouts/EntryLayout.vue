@@ -139,13 +139,20 @@
           <q-card-section>
             <q-form @submit="searchSubmit" class="q-gutter-md">
               <q-input filled v-model="searchTerm" label="검색어" />
-              <q-btn label="검색" type="submit" color="primary" />
+              <q-btn unelevated label="검색" type="submit" color="primary" />
             </q-form>
+            <p></p>
+            <p>
+              {{ searchedMessage }}
+            </p>
           </q-card-section>
 
           <q-separator />
 
-          <q-card-section style="max-width: 300px" class="scroll">
+          <q-card-section
+            style="min-width: 300px; min-height: 200px; max-height: 200px"
+            class="scroll"
+          >
             <p>
               <span
                 class="ej text-dark"
@@ -395,6 +402,7 @@ export default {
       'theEntryId',
       'similars',
       'searchedSimilar',
+      'searchedMessage',
       'entry',
       'synset',
       'mergingSynset',

@@ -35,7 +35,7 @@
       v-model="leftDrawerOpen"
       bordered
       content-class="bg-grey-2"
-      :width="220"
+      :width="270"
     >
       <div class="q-gutter-md" style="padding: 10px 10px;">
         <q-select
@@ -92,6 +92,30 @@
                     v-show="scope.opt.allComplete"
                   >
                     완료
+                  </q-badge>
+                  <q-badge
+                    color="deep-orange-8"
+                    text-color="white"
+                    text-size="sm"
+                    v-show="scope.opt.cntOpenIssues"
+                  >
+                    {{ scope.opt.cntOpenIssues }}
+                  </q-badge>
+                  <q-badge
+                    color="indigo-8"
+                    text-color="white"
+                    text-size="sm"
+                    v-show="scope.opt.cntRepliedIssues"
+                  >
+                    {{ scope.opt.cntRepliedIssues }}
+                  </q-badge>
+                  <q-badge
+                    color="grey-8"
+                    text-color="white"
+                    text-size="sm"
+                    v-show="scope.opt.cntClosedIssues"
+                  >
+                    {{ scope.opt.cntClosedIssues }}
                   </q-badge>
                 </q-item-label>
               </q-item-section>
@@ -199,9 +223,11 @@ export default {
   watch: {
     theDomain() {
       this.syncWorksets();
+      this.pickTheWorksetId('');
     },
     theUserId() {
       this.syncWorksets();
+      this.pickTheWorksetId('');
     },
     theWorksetId() {
       this.fetchEntryMarkings();

@@ -28,6 +28,7 @@ export default {
   theEntryId: '',
   similars: {},
   searchedSimilar: {},
+  searchedMessage: '',
   entry: {
     orthForm: '',
     domain: '',
