@@ -71,7 +71,11 @@
       </p>
       <div class="q-pa-md q-gutter-sm">
         <q-card
-          class="bg-grey-2 my-card"
+          :class="
+            roles.supervisor.includes(item.sender)
+              ? 'bg-indigo-1'
+              : 'bg-deep-orange-1'
+          "
           flat
           bordered
           v-for="(item, index) in Object.values(issue.messages)"
@@ -396,6 +400,7 @@ export default {
 
   computed: {
     ...mapState([
+      'roles',
       'theDomain',
       'theUserId',
       'theWorksetId',
