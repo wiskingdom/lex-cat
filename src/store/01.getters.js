@@ -124,12 +124,22 @@ const currentSemTag = state => {
 //
 const semHints = state => {
   const { sem } = state.entry;
-  const semCods = Object.entries(state.labels.sem).map(([value, tag]) => ({
+  const semCodes = Object.entries(state.labels.sem).map(([value, tag]) => ({
     value,
     tag: `[${value}]\n${tag}`,
   }));
   const semReg = new RegExp(`^${sem}\\d$`);
-  return semCods.filter(item => item.value.match(semReg));
+  const hintCodes = semCodes.filter(item => item.value.match(semReg));
+  const hasTwoZero = hintCodes.some(item => item.value.match('00'));
+  return hasTwoZero
+    ? [
+        ...hintCodes.filter(item => !item.value.match('00')),
+        ...hintCodes.filter(item => item.value.match('00')),
+      ]
+    : [
+        ...hintCodes.filter(item => !item.value.match('0')),
+        ...hintCodes.filter(item => item.value.match('0')),
+      ];
 };
 const semValid = state => {
   const pos = state.entry.pos ? state.entry.pos : 'any';
