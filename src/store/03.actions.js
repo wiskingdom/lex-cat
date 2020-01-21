@@ -151,7 +151,7 @@ const fetchSearchedSimilar = ({ state, commit }, string) => {
         const entryIds = Object.keys(theValue);
         let similar = {};
         entryIds.forEach(entryId => {
-          similar[entryId] = theValue[entryId].orthForm;
+          similar[entryId] = theValue[entryId];
         });
         commit('SEARCHED_SIMILAR', similar);
         commit('SEARCHED_MESSAGE', '검색 결과입니다.');

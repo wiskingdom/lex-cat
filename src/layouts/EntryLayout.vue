@@ -142,8 +142,14 @@
         <q-card>
           <q-card-section>
             <q-form @submit="searchSubmit" class="q-gutter-md">
-              <q-input filled v-model="searchTerm" label="검색어" />
-              <q-btn unelevated label="검색" type="submit" color="primary" />
+              <q-input dense filled v-model="searchTerm" label="검색어" />
+              <q-btn
+                dense
+                unelevated
+                label="검색"
+                type="submit"
+                color="primary"
+              />
             </q-form>
             <p></p>
             <p>
@@ -154,24 +160,54 @@
           <q-separator />
 
           <q-card-section
-            style="min-width: 300px; min-height: 200px; max-height: 200px"
+            style="min-width: 500px; min-height: 200px; max-height: 200px"
             class="scroll"
           >
-            <p>
-              <span
-                class="ej text-dark"
-                :class="{
-                  'text-blue-8': isSynMember(`${key}`),
-                  'text-bold': isSynMember(`${key}`),
-                  'cursor-pointer': !isSynMember(`${key}`),
-                }"
-                @click="mergeReady(`${key}`)"
-                v-for="(item, key) in searchedSimilar"
-                v-show="item !== entry.orthForm"
-                :key="key"
-                >{{ item }}<br />
-              </span>
-            </p>
+            <q-markup-table dense flat>
+              <thead>
+                <tr>
+                  <th class="text-left">키워드</th>
+                  <th class="text-left">품사분류</th>
+                  <th class="text-left">의미분류</th>
+                  <th class="text-left">정의</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  @click="mergeReady(`${key}`)"
+                  class="ej text-dark"
+                  :class="{
+                    'text-blue-8': isSynMember(`${key}`),
+                    'text-bold': isSynMember(`${key}`),
+                    'cursor-pointer': !isSynMember(`${key}`),
+                  }"
+                  v-for="(item, key) in searchedSimilar"
+                  v-show="item.orthForm !== entry.orthForm"
+                  :key="key"
+                >
+                  <td>
+                    {{ item.orthForm }}
+                  </td>
+                  <td>
+                    {{ item.pos }}
+                  </td>
+                  <td>
+                    {{ semCodeToTag(item.sem) }}
+                  </td>
+                  <td>
+                    <span v-show="item.description"
+                      >보기<q-tooltip
+                        content-style="font-size: 13px"
+                        anchor="top left"
+                        self="bottom middle"
+                      >
+                        {{ item.description }}
+                      </q-tooltip></span
+                    ><span v-show="!item.description">없음</span>
+                  </td>
+                </tr>
+              </tbody>
+            </q-markup-table>
           </q-card-section>
 
           <q-separator />
@@ -495,6 +531,13 @@ export default {
       'onoffIssue',
     ]),
     copyToClipboard: copyToClipboard,
+    semCodeToTag(semCode) {
+      const tag = this.labels.sem[semCode];
+      if (!semCode) {
+        return '미분류';
+      }
+      return `[${semCode}] ${tag}`;
+    },
     pushIssuHandle() {
       const text = this.editor
         .trim()
