@@ -1,3 +1,9 @@
+const THE_CURRENT_USER = (state, payload) => {
+  state.theCurrentUser = payload;
+};
+const THE_TAB = (state, payload) => {
+  state.theTab = payload;
+};
 const DOMAIN_NAMES = (state, payload) => {
   state.domainNames = payload;
 };
@@ -101,6 +107,8 @@ const IS_CLOSED = (state, payload) => {
 };
 
 export {
+  THE_CURRENT_USER,
+  THE_TAB,
   DOMAIN_NAMES,
   USER_CONTEXT,
   THE_DOMAIN,

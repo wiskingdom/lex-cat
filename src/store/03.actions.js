@@ -3,6 +3,16 @@ import fireapp from '@/fireapp';
 const db = fireapp.database();
 const auth = fireapp.auth();
 
+const changeTheCurrentUser = ({ commit }, payload) =>
+  new Promise(resolve => {
+    commit('THE_CURRENT_USER', payload);
+    resolve();
+  });
+const pickTheTab = ({ commit }, payload) =>
+  new Promise(resolve => {
+    commit('THE_TAB', payload);
+    resolve();
+  });
 const fetchDomainNames = ({ commit }) =>
   new Promise(resolve => {
     db.ref('/app/domainNames')
@@ -435,6 +445,8 @@ const updateExtraSyns = ({ state, commit }) =>
 
 export {
   // common
+  changeTheCurrentUser,
+  pickTheTab,
   fetchDomainNames,
   fetchUserContext,
   fetchUsers,

@@ -20,12 +20,13 @@
       </div>
     </div>
     <div class="q-gutter-md text-center" style="margin-top: 30px">
-      <q-btn color="primary" @click="login" label="Login" />
+      <q-btn unelevated color="primary" @click="login" label="Login" />
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 export default {
   name: 'login',
   data() {
@@ -38,11 +39,13 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['changeTheCurrentUser']),
     login() {
       this.$auth
         .signInWithEmailAndPassword(this.user.email, this.user.password)
         .then(() => {
-          this.$router.push('main');
+          this.changeTheCurrentUser(this.$auth.currentUser);
+          this.$router.push('/main');
         })
         .catch(err => {
           this.$q.dialog({

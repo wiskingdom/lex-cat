@@ -3,10 +3,10 @@ import VueRouter from 'vue-router';
 import Login from '../views/Login.vue';
 import MainLayout from '../layouts/MainLayout.vue';
 import MainAbout from '../views/MainAbout.vue';
-import EntryLayout from '../layouts/EntryLayout.vue';
-//import fireapp from '@/fireapp';
+import MainEntry from '../views/MainEntry.vue';
+import fireapp from '@/fireapp';
 // const db = fireapp.database();
-//const auth = fireapp.auth();
+const auth = fireapp.auth();
 
 Vue.use(VueRouter);
 
@@ -27,6 +27,11 @@ const routes = [
   {
     path: '/main',
     component: MainLayout,
+    beforeEnter: (to, from, next) => {
+      if (auth.currentUser) {
+        next();
+      }
+    },
     children: [
       {
         path: '/',
@@ -39,9 +44,14 @@ const routes = [
       },
       {
         path: ':entryId',
-        component: EntryLayout,
+        component: MainEntry,
       },
     ],
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: {},
   },
 ];
 

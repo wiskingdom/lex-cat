@@ -1,36 +1,5 @@
 <template>
-  <q-layout view="HHh Lpr lFf">
-    <q-header bordered class="bg-grey-2 text-primary">
-      <q-toolbar>
-        <q-toolbar-title>사전 관리 도구</q-toolbar-title>
-
-        <q-btn
-          flat
-          class="text-bold"
-          color="grey-8"
-          unelevated
-          to="/main/about"
-          :label="'등재&분류 도구'"
-          style="margin-left: 10px"
-        />
-        <q-space />
-        <q-space />
-        <q-space />
-
-        <div v-show="theUserId">
-          <q-icon :name="selectedMood" />
-          {{ $auth.currentUser.email }}
-        </div>
-        <q-btn
-          color="primary"
-          unelevated
-          @click="logout"
-          :label="logBTN"
-          style="margin-left: 10px"
-        />
-      </q-toolbar>
-    </q-header>
-
+  <q-layout view="hHh lpR fFf">
     <q-drawer
       v-model="leftDrawerOpen"
       bordered
@@ -165,7 +134,7 @@
       <q-btn
         dense
         unelevated
-        color="primary"
+        color="grey-5"
         @click="leftDrawerOpen = !leftDrawerOpen"
         aria-label="Menu"
         icon="menu"
@@ -188,23 +157,6 @@ export default {
   },
 
   computed: {
-    currentUser() {
-      return this.$auth.currentUser;
-    },
-    logBTN() {
-      return this.currentUser ? 'logout' : 'login';
-    },
-    selectedMood() {
-      return [
-        'mood',
-        'mood_bad',
-        'sentiment_dissatisfied',
-        'sentiment_satisfied',
-        'sentiment_very_dissatisfied',
-        'sentiment_very_satisfied',
-        'airline_seat_individual_suite',
-      ].sort(() => Math.random() - 0.5)[0];
-    },
     ...mapState([
       'domainNames',
       'userContext',
@@ -220,6 +172,7 @@ export default {
       'annotatorCode',
     ]),
   },
+
   watch: {
     theDomain() {
       this.unsyncWorksets().then(this.syncWorksets());
@@ -251,11 +204,6 @@ export default {
       'fetchEntryMarkings',
       'pickTheEntryId',
     ]),
-    logout() {
-      this.$auth.signOut().then(() => {
-        this.$router.push('/login');
-      });
-    },
     dialog(value) {
       this.$q.dialog({
         title: 'Log',
@@ -280,6 +228,7 @@ export default {
       });
     });
   },
+
   beforeDestroy() {
     //this.$auth.signOut();
     this.pickTheDomain('');

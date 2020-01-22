@@ -1,5 +1,7 @@
 export default {
   // meta
+  theCurrentUser: {},
+  theTab: '',
   domainNames: [],
   userContext: {
     default: '',

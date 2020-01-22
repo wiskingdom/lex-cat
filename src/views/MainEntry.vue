@@ -437,7 +437,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import { copyToClipboard } from 'quasar';
 
 export default {
-  name: 'EntryLayout',
+  name: 'MainEntry',
 
   data() {
     return {
