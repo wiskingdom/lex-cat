@@ -97,7 +97,6 @@ export default {
   destroyed() {
     this.pickTheDomain('');
     this.pickTheUserId('');
-    console.log('main destroy');
   },
 };
 </script>
