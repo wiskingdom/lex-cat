@@ -1,7 +1,8 @@
 export default {
   // meta
-  theCurrentUser: {},
-  theTab: '',
+  theCurrentUser: {
+    email: '',
+  },
   domainNames: [],
   userContext: {
     default: '',
@@ -14,7 +15,7 @@ export default {
     supervisor: [''],
   },
   theUserId: '',
-  // entrywork
+  // main tool
   labels: {
     pos: {},
     sem: {},
@@ -28,6 +29,7 @@ export default {
   worksetsRef: '',
   theWorksetId: '',
   entryMarkings: {},
+  // entry
   theEntryId: '',
   similars: {},
   searchedSimilar: {},
@@ -53,4 +55,7 @@ export default {
     isClosed: false,
     messages: [],
   },
+  // issue tool
+  theIssueCode: '',
+  issueMarkings: {},
 };

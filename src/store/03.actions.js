@@ -5,13 +5,15 @@ const auth = fireapp.auth();
 
 const changeTheCurrentUser = ({ commit }, payload) =>
   new Promise(resolve => {
-    commit('THE_CURRENT_USER', payload);
-    resolve();
-  });
-const pickTheTab = ({ commit }, payload) =>
-  new Promise(resolve => {
-    commit('THE_TAB', payload);
-    resolve();
+    if (payload) {
+      commit('THE_CURRENT_USER', payload);
+      resolve();
+    } else {
+      commit('THE_CURRENT_USER', {
+        email: '',
+      });
+      resolve();
+    }
   });
 const fetchDomainNames = ({ commit }) =>
   new Promise(resolve => {
@@ -30,6 +32,15 @@ const fetchUserContext = ({ commit }) =>
         commit('USER_CONTEXT', snap.val());
         resolve();
       });
+  });
+const initUserContext = ({ commit }) =>
+  new Promise(resolve => {
+    commit('USER_CONTEXT', {
+      default: '',
+      role: 'annotator',
+      code: 0,
+    });
+    resolve();
   });
 
 const pickTheDomain = ({ commit }, domainName) =>
@@ -446,9 +457,9 @@ const updateExtraSyns = ({ state, commit }) =>
 export {
   // common
   changeTheCurrentUser,
-  pickTheTab,
   fetchDomainNames,
   fetchUserContext,
+  initUserContext,
   fetchUsers,
   fetchRoles, // new
   pickTheUserId,

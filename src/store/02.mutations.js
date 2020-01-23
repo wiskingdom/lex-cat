@@ -1,9 +1,6 @@
 const THE_CURRENT_USER = (state, payload) => {
   state.theCurrentUser = payload;
 };
-const THE_TAB = (state, payload) => {
-  state.theTab = payload;
-};
 const DOMAIN_NAMES = (state, payload) => {
   state.domainNames = payload;
 };
@@ -105,10 +102,15 @@ const ISSUE_MESSAGES = (state, { newKey, sender, text }) => {
 const IS_CLOSED = (state, payload) => {
   state.issue.isClosed = payload;
 };
+const THE_ISSUE_CODE = (state, payload) => {
+  state.theIssueCode = payload;
+};
+const ISSUE_MARKINGS = (state, payload) => {
+  state.issueMarkings = payload;
+};
 
 export {
   THE_CURRENT_USER,
-  THE_TAB,
   DOMAIN_NAMES,
   USER_CONTEXT,
   THE_DOMAIN,
@@ -142,4 +144,6 @@ export {
   ISSUE_MESSAGES,
   ISSUE_CODE,
   IS_CLOSED,
+  ISSUE_MARKINGS,
+  THE_ISSUE_CODE,
 };

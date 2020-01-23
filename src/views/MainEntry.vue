@@ -63,7 +63,6 @@
       </p>
       <p>
         <span class=" ej text-dark">{{ entry.description }}</span>
-        <span class=" ej text-dark" v-show="!entry.description">없음</span>
       </p>
       <!-- issue -->
       <p>
@@ -485,18 +484,6 @@ export default {
       'mergingSyns',
     ]),
   },
-  watch: {
-    $route: {
-      handler() {
-        this.update();
-        if (!this.theDomain || !this.theUserId) {
-          this.allFetch();
-        } else {
-          this.fetch();
-        }
-      },
-    },
-  },
 
   methods: {
     ...mapActions([
@@ -668,7 +655,7 @@ export default {
         this.fetchUserContext(),
         this.fetchRoles(),
       ]).then(() => {
-        this.pickTheUserId(this.currentUserEmail);
+        this.pickTheUserId(this.$auth.currentUser.email);
         this.pickTheDomain(this.defaultDomain).then(() => {
           this.fetchUsers();
           this.fetchLabels();

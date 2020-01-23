@@ -91,7 +91,6 @@
             </q-item>
           </template></q-select
         >
-
         <q-list dense separator bordered class="bg-grey-1">
           <q-item
             clickable
@@ -204,6 +203,23 @@ export default {
       'fetchEntryMarkings',
       'pickTheEntryId',
     ]),
+    mainInit() {
+      Promise.all([
+        this.fetchDomainNames(),
+        this.fetchUserContext(),
+        this.fetchRoles(),
+      ])
+        .then(() =>
+          Promise.all([
+            this.pickTheDomain(this.defaultDomain),
+            this.fetchUsers(),
+          ]),
+        )
+        .then(() => {
+          this.fetchLabels();
+          this.syncWorksets();
+        });
+    },
     dialog(value) {
       this.$q.dialog({
         title: 'Log',
@@ -213,26 +229,10 @@ export default {
   },
 
   created() {
-    Promise.all([
-      this.fetchDomainNames(),
-      this.fetchUserContext(),
-      this.fetchRoles(),
-    ]).then(() => {
-      Promise.all([
-        this.pickTheUserId(this.$auth.currentUser.email),
-        this.pickTheDomain(this.defaultDomain),
-        this.fetchUsers(),
-      ]).then(() => {
-        this.fetchLabels();
-        this.syncWorksets();
-      });
-    });
+    this.mainInit();
   },
 
   beforeDestroy() {
-    //this.$auth.signOut();
-    this.pickTheDomain('');
-    this.pickTheUserId('');
     this.pickTheWorksetId('');
     this.initEntryMarkings();
   },

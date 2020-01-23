@@ -7,7 +7,6 @@
           <q-tabs
             align="left"
             indicator-color="grey-8"
-            switch-indicator
             narrow-indicator
             active-color="grey-8"
             v-show="$auth.currentUser"
@@ -19,17 +18,17 @@
               :label="'등재&분류 도구'"
             />
             <q-route-tab
-              name="search"
+              name="issue"
               class="text-bold text-grey-6"
-              to="/search/"
-              :label="'검색 도구'"
+              to="/issue/"
+              :label="'이슈 처리 도구'"
+              v-show="userContext.role === 'supervisor'"
             />
           </q-tabs>
 
           <q-space />
-          <q-space />
 
-          <div v-show="theCurrentUser.email">
+          <div v-show="$auth.currentUser">
             <q-icon :name="selectedMood" />
             {{ theCurrentUser.email }}
           </div>
@@ -37,7 +36,7 @@
             color="primary"
             unelevated
             @click="logout"
-            :label="logBTN"
+            label="logout"
             style="margin-left: 10px"
             v-show="$auth.currentUser"
           />
@@ -55,7 +54,7 @@
 import { mapState, mapActions } from 'vuex';
 export default {
   computed: {
-    ...mapState(['theCurrentUser', 'theTab']),
+    ...mapState(['theCurrentUser', 'userContext']),
     selectedMood() {
       return [
         'mood',
@@ -67,20 +66,38 @@ export default {
         'airline_seat_individual_suite',
       ].sort(() => Math.random() - 0.5)[0];
     },
-    logBTN() {
-      return this.theCurrentUser.email ? 'logout' : 'login';
-    },
   },
   methods: {
-    ...mapActions(['changeTheCurrentUser', 'pickTheTab']),
+    ...mapActions([
+      'changeTheCurrentUser',
+      'pickTheUserId',
+      'fetchUserContext',
+      'initUserContext',
+      'pickTheDomain',
+      'pickTheWorksetId',
+      'initEntryMarkings',
+    ]),
     logout() {
       if (this.$auth.currentUser) {
         this.$auth.signOut().then(() => {
-          this.changeTheCurrentUser({});
+          this.changeTheCurrentUser(this.$auth.currentUser);
+          this.initUserContext();
           this.$router.push('/login');
         });
       }
     },
+  },
+  created() {
+    this.$auth.onAuthStateChanged(() => {
+      this.changeTheCurrentUser(this.$auth.currentUser);
+    });
+    this.pickTheUserId(this.$auth.currentUser.email);
+    this.fetchUserContext();
+  },
+  destroyed() {
+    this.pickTheDomain('');
+    this.pickTheUserId('');
+    console.log('main destroy');
   },
 };
 </script>

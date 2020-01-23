@@ -3,12 +3,12 @@
     <h5 class="login-title text-center">LOGIN</h5>
     <div class="q-gutter-md">
       <div class="row justify-center">
-        <div class="col-md-5">
+        <div class="col-md-5" style="max-width: 300px">
           <q-input outlined type="email" label="Email" v-model="user.email" />
         </div>
       </div>
       <div class="row justify-center">
-        <div class="col-md-5">
+        <div class="col-md-5" style="max-width: 300px">
           <q-input
             outlined
             type="password"
@@ -39,12 +39,18 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['changeTheCurrentUser']),
+    ...mapActions([
+      'changeTheCurrentUser',
+      'fetchUserContext',
+      'pickTheUserId',
+    ]),
     login() {
       this.$auth
         .signInWithEmailAndPassword(this.user.email, this.user.password)
         .then(() => {
           this.changeTheCurrentUser(this.$auth.currentUser);
+          this.pickTheUserId(this.$auth.currentUser.email);
+          this.fetchUserContext();
           this.$router.push('/main');
         })
         .catch(err => {
