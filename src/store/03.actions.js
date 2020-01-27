@@ -142,7 +142,19 @@ const pickTheEntryId = ({ commit }, entryId) =>
 
 const initEntry = ({ commit }) => {
   commit('SIMILARS', {});
-  commit('ENTRY', {});
+  commit('ENTRY', {
+    orthForm: '',
+    domain: '',
+    sourcedFrom: '',
+    description: '',
+    isSkipped: false,
+    needCheck: false,
+    pos: '',
+    sem: '',
+    synOf: '',
+    extraSyns: {},
+    updatedBy: '',
+  });
   commit('SYNSET', {});
   commit('ISSUE', {
     isImportant: false,
@@ -250,6 +262,9 @@ const updateSynset = ({ state, commit }, mode) =>
     if (mode !== 'delete') {
       commit('SYNSET', { ...state.synset, ...state.mergingSynset });
       commit('HAS_SYNSET', true);
+      db.ref(`/dict/${state.theDomain}/lookup/${state.theEntryId}`).update({
+        hasSynset: true,
+      });
       if (state.mergingSynsetId) {
         if (state.entry.synOf) {
           const synIds = Object.keys(state.synset);
@@ -303,6 +318,9 @@ const updateSynset = ({ state, commit }, mode) =>
       synset[state.entry.entryId] = state.entry.orthForm;
       commit('SYNSET', synset);
       commit('HAS_SYNSET', false);
+      db.ref(`/dict/${state.theDomain}/lookup/${state.theEntryId}`).update({
+        hasSynset: false,
+      });
       resolve();
     }
   });
@@ -348,7 +366,15 @@ const getIssueCode = role => issue => {
 const pushIssue = ({ state, commit }, { sender, text }) =>
   new Promise(resolve => {
     if (text.replace(/<.+?>/g, '').split('').length > 1) {
-      const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
+      const {
+        theDomain,
+        theWorksetId,
+        theEntryId,
+        issue,
+        roles,
+        entry,
+      } = state;
+      const { orthForm } = entry;
       const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}/messages`);
       const newKey = ref.push().key;
       ref.child(newKey).set({ sender, text });
@@ -359,12 +385,17 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
       db.ref(
         `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
       ).update({ issueProcess });
+      db.ref(`/dict/${theDomain}/issues/${theEntryId}`).update({
+        issueProcess,
+        orthForm,
+      });
       resolve();
     }
   });
 const onoffIssue = ({ state, commit }, isClosed) =>
   new Promise(resolve => {
-    const { theDomain, theWorksetId, theEntryId, issue, roles } = state;
+    const { theDomain, theWorksetId, theEntryId, issue, roles, entry } = state;
+    const { orthForm } = entry;
     if (Object.values(issue.messages > 0)) {
       const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}`);
       ref.update({ isClosed });
@@ -374,6 +405,10 @@ const onoffIssue = ({ state, commit }, isClosed) =>
       db.ref(
         `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
       ).update({ issueProcess });
+      db.ref(`/dict/${theDomain}/issues/${theEntryId}`).update({
+        issueProcess,
+        orthForm,
+      });
       commit('ISSUE_CODE', issueProcess);
       resolve();
     }
@@ -427,16 +462,22 @@ const updateEntry = ({ state, getters }) =>
       isSkipped,
       needCheck,
       updatedBy: auth.currentUser.email,
+      updatedAt: new Date().toLocaleString('ko-KR'),
     });
     resolve();
   });
 const updateStageCode = ({ state, commit }, stage) =>
   new Promise(resolve => {
-    const { theWorksetId, theEntryId } = state;
+    const { theWorksetId, theEntryId, entry } = state;
+    const { pos, sem } = entry;
     commit('STAGE_CODE', stage);
     db.ref(
       `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
     ).update({ stage });
+    const label = `${stage}-${pos}-${sem}`;
+    db.ref(`/dict/${state.theDomain}/lookup/${state.theEntryId}`).update({
+      label,
+    });
     resolve();
   });
 const updateExtraSyns = ({ state, commit }) =>
@@ -448,6 +489,9 @@ const updateExtraSyns = ({ state, commit }) =>
     db.ref(
       `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
     ).update({ hasExtraSyns });
+    db.ref(`/dict/${state.theDomain}/lookup/${theEntryId}`).update({
+      hasExtraSyns,
+    });
     db.ref(`/dict/${state.theDomain}/entries/${theEntryId}`).update({
       extraSyns,
     });

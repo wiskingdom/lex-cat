@@ -88,15 +88,11 @@ export default {
     },
   },
   created() {
-    this.$auth.onAuthStateChanged(() => {
+    if (this.$auth.currentUser) {
       this.changeTheCurrentUser(this.$auth.currentUser);
-    });
-    this.pickTheUserId(this.$auth.currentUser.email);
-    this.fetchUserContext();
-  },
-  destroyed() {
-    this.pickTheDomain('');
-    this.pickTheUserId('');
+      this.pickTheUserId(this.$auth.currentUser.email);
+      this.fetchUserContext();
+    }
   },
 };
 </script>

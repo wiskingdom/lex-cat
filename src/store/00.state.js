@@ -53,7 +53,7 @@ export default {
   issue: {
     isImportant: false,
     isClosed: false,
-    messages: [],
+    messages: {},
   },
   // issue tool
   theIssueCode: '',
