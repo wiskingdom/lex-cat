@@ -265,27 +265,18 @@ const updateSynset = ({ state, commit }, mode) =>
       db.ref(`/dict/${state.theDomain}/lookup/${state.theEntryId}`).update({
         hasSynset: true,
       });
+      const synIds = Object.keys(state.synset);
       if (state.mergingSynsetId) {
-        if (state.entry.synOf) {
-          const synIds = Object.keys(state.synset);
-          synIds.forEach(entryId => {
-            db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
-              synOf: state.mergingSynsetId,
-            });
+        synIds.forEach(entryId => {
+          db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
+            synOf: state.mergingSynsetId,
           });
-          resolve();
-        } else {
-          db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`).update(
-            {
-              synOf: state.mergingSynsetId,
-            },
-          );
-          resolve();
-        }
+        });
+        commit('ENTRY_SYN_OF', state.mergingSynsetId);
+        resolve();
       } else {
         if (state.entry.synOf) {
-          const mergSynIds = Object.keys(state.mergingSynset);
-          mergSynIds.forEach(entryId => {
+          synIds.forEach(entryId => {
             db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
               synOf: state.entry.synOf,
             });
@@ -294,17 +285,12 @@ const updateSynset = ({ state, commit }, mode) =>
         } else {
           const newSynsetId = db.ref(`/dict/${state.theDomain}/synsets`).push()
             .key;
-          db.ref(`/dict/${state.theDomain}/entries/${state.theEntryId}`).update(
-            {
-              synOf: newSynsetId,
-            },
-          );
-          const mergSynIds = Object.keys(state.mergingSynset);
-          mergSynIds.forEach(entryId => {
+          synIds.forEach(entryId => {
             db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
               synOf: newSynsetId,
             });
           });
+          commit('ENTRY_SYN_OF', newSynsetId);
           resolve();
         }
       }
