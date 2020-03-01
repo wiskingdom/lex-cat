@@ -22,7 +22,7 @@
               class="text-bold text-grey-6"
               to="/issue/"
               :label="'이슈 처리 도구'"
-              v-show="userContext.role === 'supervisor'"
+              v-show="userContext.role === 'admin'"
             />
           </q-tabs>
 
