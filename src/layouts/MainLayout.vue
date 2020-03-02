@@ -182,16 +182,22 @@ export default {
         this.syncWorksets();
       });
       this.pickTheWorksetId('');
-      this.$router.push('/main/about');
+      if (this.$route.params.entryId) {
+        this.$router.push('/main/about');
+      }
     },
     theUserId() {
       this.unsyncWorksets().then(this.syncWorksets());
       this.pickTheWorksetId('');
-      this.$router.push('/main/about');
+      if (this.$route.params.entryId) {
+        this.$router.push('/main/about');
+      }
     },
     theWorksetId() {
       this.fetchEntryMarkings();
-      this.$router.push('/main/about');
+      if (this.$route.params.entryId) {
+        this.$router.push('/main/about');
+      }
     },
   },
 
