@@ -19,6 +19,15 @@ const ROLES = (state, payload) => {
 const THE_USER_ID = (state, payload) => {
   state.theUserId = payload;
 };
+
+const GUIDE = (state, payload) => {
+  state.guide = payload;
+};
+
+const SEARCH_LINKS = (state, payload) => {
+  state.searchLinks = payload;
+};
+
 const LABELS = (state, payload) => {
   state.labels = payload;
 };
@@ -117,6 +126,8 @@ export {
   USERS,
   ROLES,
   THE_USER_ID,
+  GUIDE,
+  SEARCH_LINKS,
   LABELS,
   SUMMARY,
   WORKSETS,

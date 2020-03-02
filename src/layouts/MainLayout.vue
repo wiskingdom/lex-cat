@@ -174,15 +174,24 @@ export default {
 
   watch: {
     theDomain() {
-      this.unsyncWorksets().then(this.syncWorksets());
+      this.unsyncWorksets().then(() => {
+        this.fetchUsers();
+        this.fetchLabels();
+        this.fetchGuide();
+        this.fetchSearchLinks();
+        this.syncWorksets();
+      });
       this.pickTheWorksetId('');
+      this.$router.push('/main/about');
     },
     theUserId() {
       this.unsyncWorksets().then(this.syncWorksets());
       this.pickTheWorksetId('');
+      this.$router.push('/main/about');
     },
     theWorksetId() {
       this.fetchEntryMarkings();
+      this.$router.push('/main/about');
     },
   },
 
@@ -194,6 +203,8 @@ export default {
       'fetchUsers',
       'pickTheUserId',
       'pickTheDomain',
+      'fetchGuide',
+      'fetchSearchLinks',
       'fetchLabels',
       'syncSummary',
       'syncWorksets',
@@ -217,6 +228,8 @@ export default {
         )
         .then(() => {
           this.fetchLabels();
+          this.fetchGuide();
+          this.fetchSearchLinks();
           this.syncWorksets();
         });
     },

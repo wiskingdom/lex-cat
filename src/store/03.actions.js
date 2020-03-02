@@ -73,6 +73,26 @@ const fetchRoles = ({ commit }) =>
       });
   });
 
+const fetchGuide = ({ state, commit }) =>
+  new Promise(resolve => {
+    db.ref(`/app/guide/${state.theDomain}`)
+      .once('value')
+      .then(snap => {
+        commit('GUIDE', snap.val());
+        resolve();
+      });
+  });
+
+const fetchSearchLinks = ({ state, commit }) =>
+  new Promise(resolve => {
+    db.ref(`/app/searchLinks/${state.theDomain}`)
+      .once('value')
+      .then(snap => {
+        commit('SEARCH_LINKS', snap.val());
+        resolve();
+      });
+  });
+
 const fetchLabels = ({ state, commit }) =>
   new Promise(resolve => {
     db.ref(`/app/labels/${state.theDomain}`)
@@ -494,6 +514,8 @@ export {
   fetchRoles, // new
   pickTheUserId,
   pickTheDomain,
+  fetchGuide,
+  fetchSearchLinks,
   fetchLabels,
   syncSummary,
   syncWorksets,

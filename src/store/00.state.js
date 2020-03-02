@@ -21,6 +21,11 @@ export default {
     sem: {},
     posSemValid: {},
   },
+  guide: {
+    name: '',
+    path: '',
+  },
+  searchLinks: [],
   summary: {
     all: {},
     users: {},

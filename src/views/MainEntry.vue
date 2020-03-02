@@ -17,25 +17,11 @@
             class="text-bold"
             color="grey-8"
             unelevated
-            label="네이버"
+            :label="item.label"
             style="margin-left: 10px"
-            @click="naverPop()"
-          />
-          <q-btn
-            class="text-bold"
-            color="grey-8"
-            unelevated
-            label="매일경제"
-            style="margin-left: 10px"
-            @click="dailyPop()"
-          />
-          <q-btn
-            class="text-bold"
-            color="grey-8"
-            unelevated
-            label="기업정보"
-            style="margin-left: 10px"
-            @click="nicePop()"
+            @click="externPop(item.linkParts)"
+            v-for="(item, index) in searchLinks"
+            :key="`externLink${index}`"
           />
         </div>
       </div>
@@ -465,6 +451,7 @@ export default {
       'mergingSynsetId',
       'issue',
       'labels',
+      'searchLinks',
     ]),
     ...mapGetters([
       'theSuperNum',
@@ -538,20 +525,8 @@ export default {
       });
       this.editor = '';
     },
-    naverPop() {
-      const link = `https://m.search.naver.com/search.naver?where=m_news&sm=mtb_jum&query=${this.entry.orthForm}`;
-      const linkUri = encodeURI(link);
-      window.open(linkUri, 'popup', 'width=900,height=900');
-      return false;
-    },
-    nicePop() {
-      const link = `https://m.nicebizinfo.com/ep/EP0100M001GE.nice?itgSrch=${this.entry.orthForm}`;
-      const linkUri = encodeURI(link);
-      window.open(linkUri, 'popup', 'width=900,height=900');
-      return false;
-    },
-    dailyPop() {
-      const link = `http://find.mk.co.kr/new/search.php?page=total&&s_keyword=${this.entry.orthForm}#`;
+    externPop(linkParts) {
+      const link = `${linkParts.pre}${this.entry.orthForm}${linkParts.post}`;
       const linkUri = encodeURI(link);
       window.open(linkUri, 'popup', 'width=900,height=900');
       return false;
