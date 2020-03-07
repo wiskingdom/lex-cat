@@ -126,7 +126,6 @@
             </q-item-section>
           </q-item>
         </q-list>
-        <p>{{ $router.currentRoute.name }}</p>
       </div>
     </q-drawer>
 

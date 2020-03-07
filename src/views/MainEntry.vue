@@ -636,9 +636,8 @@ export default {
           ]).then(() => {
             this.pickTheUserId(this.$auth.currentUser.email);
             this.pickTheDomain(this.domainCodeMap[domainCode]).then(() => {
-              this.fetchUsers();
               this.fetchLabels();
-              this.syncWorksets();
+              this.fetchUsers().then(this.syncWorksets);
               this.markFetchedMain();
               this.fetchEntry().then(() => {
                 this.fetchSynset();
