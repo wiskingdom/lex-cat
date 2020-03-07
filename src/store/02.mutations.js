@@ -4,6 +4,9 @@ const THE_CURRENT_USER = (state, payload) => {
 const DOMAIN_NAMES = (state, payload) => {
   state.domainNames = payload;
 };
+const DOMAIN_CODE_MAP = (state, payload) => {
+  state.domainCodeMap = payload;
+};
 const USER_CONTEXT = (state, payload) => {
   state.userContext = payload;
 };
@@ -30,6 +33,10 @@ const SEARCH_LINKS = (state, payload) => {
 
 const LABELS = (state, payload) => {
   state.labels = payload;
+};
+
+const FETCHED_MAIN = (state, payload) => {
+  state.fetchedMain = payload;
 };
 
 const SUMMARY = (state, payload) => {
@@ -121,6 +128,7 @@ const ISSUE_MARKINGS = (state, payload) => {
 export {
   THE_CURRENT_USER,
   DOMAIN_NAMES,
+  DOMAIN_CODE_MAP,
   USER_CONTEXT,
   THE_DOMAIN,
   USERS,
@@ -130,6 +138,7 @@ export {
   SEARCH_LINKS,
   LABELS,
   SUMMARY,
+  FETCHED_MAIN,
   WORKSETS,
   WORKSETS_REF,
   THE_WORKSET_ID,

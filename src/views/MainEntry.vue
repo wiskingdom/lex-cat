@@ -438,7 +438,10 @@ export default {
   computed: {
     ...mapState([
       'roles',
+      'domainNames',
+      'fetchedMain',
       'theDomain',
+      'domainCodeMap',
       'theUserId',
       'theWorksetId',
       'theEntryId',
@@ -482,6 +485,7 @@ export default {
       'pickTheDomain',
       'fetchLabels',
       'syncSummary',
+      'markFetchedMain',
       'syncWorksets',
       'pickTheWorksetId',
       'pickTheEntryId',
@@ -611,42 +615,51 @@ export default {
     fetch() {
       const { entryId } = this.$route.params;
       this.pickTheEntryId(entryId).then(() => {
-        this.fetchEntry().then(() => {
-          this.fetchSynset();
-        });
-        this.fetchSimilars();
-        this.fetchIssue();
-        this.pickTheEntryId(entryId);
+        const domainCode = entryId.split('-')[0];
         const worksetId = entryId
           .split('-')
           .slice(0, 2)
           .join('-');
-        this.pickTheWorksetId(worksetId);
-      });
-    },
-    allFetch() {
-      Promise.all([
-        this.fetchDomainNames(),
-        this.fetchUserContext(),
-        this.fetchRoles(),
-      ]).then(() => {
-        this.pickTheUserId(this.$auth.currentUser.email);
-        this.pickTheDomain(this.defaultDomain).then(() => {
-          this.fetchUsers();
-          this.fetchLabels();
-          this.syncWorksets();
-          this.fetch();
-        });
+
+        if (
+          this.fetchedMain &&
+          this.domainCodeMap[domainCode] === this.theDomain
+        ) {
+          this.fetchEntry().then(() => {
+            this.fetchSynset();
+          });
+        } else {
+          Promise.all([
+            this.fetchDomainNames(),
+            this.fetchUserContext(),
+            this.fetchRoles(),
+          ]).then(() => {
+            this.pickTheUserId(this.$auth.currentUser.email);
+            this.pickTheDomain(this.domainCodeMap[domainCode]).then(() => {
+              this.fetchUsers();
+              this.fetchLabels();
+              this.syncWorksets();
+              this.markFetchedMain();
+              this.fetchEntry().then(() => {
+                this.fetchSynset();
+              });
+              this.fetchSimilars();
+              this.fetchIssue();
+              this.pickTheWorksetId(worksetId);
+            });
+          });
+        }
       });
     },
   },
-
-  created() {
-    if (!this.theDomain || !this.theUserId) {
-      this.allFetch();
-    } else {
-      this.fetch();
+  beforeCreate() {
+    const { entryId } = this.$route.params;
+    if (!entryId.match(/\w{3}-\d{4}-\d{2}-\d{2}/)) {
+      this.$router.go(-1);
     }
+  },
+  created() {
+    this.fetch();
   },
   beforeDestroy() {
     this.initEntry();

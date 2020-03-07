@@ -4,6 +4,7 @@ export default {
     email: '',
   },
   domainNames: [],
+  domainCodeMap: {},
   userContext: {
     default: '',
     role: 'annotator',
@@ -34,6 +35,7 @@ export default {
   worksetsRef: '',
   theWorksetId: '',
   entryMarkings: {},
+  fetchedMain: false,
   // entry
   theEntryId: '',
   similars: {},

@@ -20,7 +20,9 @@ const fetchDomainNames = ({ commit }) =>
     db.ref('/app/domainNames')
       .once('value')
       .then(snap => {
-        commit('DOMAIN_NAMES', snap.val());
+        const domainCodeMap = snap.val();
+        commit('DOMAIN_CODE_MAP', domainCodeMap);
+        commit('DOMAIN_NAMES', Object.values(domainCodeMap));
         resolve();
       });
   });
@@ -102,6 +104,9 @@ const fetchLabels = ({ state, commit }) =>
         resolve();
       });
   });
+const markFetchedMain = ({ commit }) => {
+  commit('FETCHED_MAIN', true);
+};
 
 const syncWorksets = ({ state, commit }) => {
   const annotatorCode = state.users.indexOf(state.theUserId);
@@ -518,6 +523,7 @@ export {
   fetchSearchLinks,
   fetchLabels,
   syncSummary,
+  markFetchedMain,
   syncWorksets,
   unsyncWorksets,
   pickTheWorksetId,

@@ -126,6 +126,7 @@
             </q-item-section>
           </q-item>
         </q-list>
+        <p>{{ $router.currentRoute.name }}</p>
       </div>
     </q-drawer>
 
@@ -173,7 +174,7 @@ export default {
   },
 
   watch: {
-    theDomain() {
+    theDomain(newVal, oldVal) {
       this.unsyncWorksets().then(() => {
         this.fetchUsers();
         this.fetchLabels();
@@ -182,22 +183,26 @@ export default {
         this.syncWorksets();
       });
       this.pickTheWorksetId('');
-      if (this.$route.params.entryId) {
+      if (
+        oldVal &&
+        newVal !== oldVal &&
+        this.$router.currentRoute.name !== 'about'
+      ) {
         this.$router.push('/main/about');
       }
     },
     theUserId() {
       this.unsyncWorksets().then(this.syncWorksets());
       this.pickTheWorksetId('');
-      if (this.$route.params.entryId) {
-        this.$router.push('/main/about');
-      }
+      //if (this.$route.params.entryId) {
+      //  this.$router.push('/main/about');
+      //}
     },
     theWorksetId() {
       this.fetchEntryMarkings();
-      if (this.$route.params.entryId) {
-        this.$router.push('/main/about');
-      }
+      //if (this.$route.params.entryId) {
+      //  this.$router.push('/main/about');
+      //}
     },
   },
 
@@ -214,6 +219,7 @@ export default {
       'fetchLabels',
       'syncSummary',
       'syncWorksets',
+      'markFetchedMain',
       'unsyncWorksets',
       'pickTheWorksetId',
       'initEntryMarkings',
@@ -237,6 +243,7 @@ export default {
           this.fetchGuide();
           this.fetchSearchLinks();
           this.syncWorksets();
+          this.markFetchedMain();
         });
     },
     dialog(value) {
@@ -248,7 +255,9 @@ export default {
   },
 
   created() {
-    this.mainInit();
+    if (this.$router.currentRoute.name !== 'entry') {
+      this.mainInit();
+    }
   },
 
   beforeDestroy() {

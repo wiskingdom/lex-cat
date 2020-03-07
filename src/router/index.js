@@ -49,6 +49,7 @@ const routes = [
       },
       {
         path: ':entryId',
+        name: 'entry',
         component: MainEntry,
       },
     ],
