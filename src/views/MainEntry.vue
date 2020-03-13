@@ -628,6 +628,7 @@ export default {
           this.fetchEntry().then(() => {
             this.fetchSynset();
           });
+          this.fetchIssue();
         } else {
           Promise.all([
             this.fetchDomainNames(),
