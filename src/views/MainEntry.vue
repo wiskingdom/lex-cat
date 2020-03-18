@@ -3,7 +3,10 @@
     <div class="col q-gutter-md" style="padding: 10px 20px;">
       <div class="row">
         <div class="col">
-          <span class="entry text-dark text-bold">{{ entry.orthForm }} </span>
+          <span class="entry text-dark text-bold">{{ entry.orthForm }} </span
+          ><span class="entry text-dark text-bold" v-show="entry.senseNum > 1"
+            >[{{ entry.senseNum }}]
+          </span>
           <q-btn
             flat
             round
@@ -152,6 +155,7 @@
               <thead>
                 <tr>
                   <th class="text-left">키워드</th>
+                  <th class="text-left">다의</th>
                   <th class="text-left">품사분류</th>
                   <th class="text-left">의미분류</th>
                   <th class="text-left">정의</th>
@@ -172,6 +176,9 @@
                 >
                   <td>
                     {{ item.orthForm }}
+                  </td>
+                  <td>
+                    {{ item.senseNum }}
                   </td>
                   <td>
                     {{ item.pos }}
@@ -382,6 +389,12 @@
         </li>
       </ul>
       <q-bar dense class="bg-grey-4 text-black text-bold">
+        <div>Poly</div>
+        <q-space />
+
+        <q-btn unelevated color="primary" label="확장" @click="addPolyItem()" />
+      </q-bar>
+      <q-bar dense class="bg-grey-4 text-black text-bold">
         <div>ISSUE</div>
         <q-space />
         <q-checkbox
@@ -507,6 +520,8 @@ export default {
       'fetchIssue',
       'pushIssue',
       'onoffIssue',
+      'addPoly',
+      'fetchEntryMarkings',
     ]),
     copyToClipboard: copyToClipboard,
     semCodeToTag(semCode) {
@@ -611,6 +626,9 @@ export default {
       } else {
         this.mergPop = false;
       }
+    },
+    addPolyItem() {
+      this.addPoly().then(this.fetchEntryMarkings);
     },
     fetch() {
       const { entryId } = this.$route.params;

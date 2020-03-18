@@ -20,6 +20,7 @@
         >
           <template v-slot:prepend> <q-icon name="sort_by_alpha" /> </template>
         </q-select>
+
         <q-select
           :value="theUserId"
           @input="pickTheUserId"
@@ -91,6 +92,21 @@
             </q-item>
           </template></q-select
         >
+        <q-form @submit="searchOrthSubmit" class="q-gutter-md">
+          <q-input
+            dense
+            filled
+            v-model="searchOrth"
+            label="표제"
+            v-show="userContext.role === 'supervisor'"
+          /><q-btn
+            dense
+            unelevated
+            label="검색"
+            type="submit"
+            color="primary"
+          />
+        </q-form>
         <q-list dense separator bordered class="bg-grey-1">
           <q-item
             clickable
@@ -102,7 +118,12 @@
             <q-item-section>
               <q-item-label>
                 {{ item.label }}
-                <q-badge :color="`${item.stageColor}`">{{
+                <q-badge
+                  outline
+                  color="grey-8"
+                  v-show="item.senseNum && item.senseNum > 1"
+                  >{{ item.senseNum }}</q-badge
+                ><q-badge :color="`${item.stageColor}`">{{
                   item.stageText
                 }}</q-badge
                 ><q-badge
@@ -152,6 +173,7 @@ export default {
   data() {
     return {
       leftDrawerOpen: true,
+      searchOrth: '',
     };
   },
 
@@ -224,7 +246,13 @@ export default {
       'initEntryMarkings',
       'fetchEntryMarkings',
       'pickTheEntryId',
+      'searchEntryMarkings',
     ]),
+    searchOrthSubmit() {
+      const directString = this.searchOrth.toUpperCase().replace(/[ -]/g, '');
+      this.searchEntryMarkings(directString);
+      this.searchOrth = '';
+    },
     mainInit() {
       Promise.all([
         this.fetchDomainNames(),

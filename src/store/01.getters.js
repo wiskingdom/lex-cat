@@ -33,6 +33,7 @@ const entryIndex = state => {
   }
   return Object.entries(state.entryMarkings).map(([value, features]) => {
     const { hasSynset, issueProcess, stage, orthForm, hasExtraSyns } = features;
+    const senseNum = features.senseNum || 1;
     const label = orthForm;
     const getStageText = stageCode => {
       if (stageCode === 0) {
@@ -95,6 +96,7 @@ const entryIndex = state => {
       hasExtraSynsText,
       issueText,
       issueColor,
+      senseNum,
     };
   });
 };

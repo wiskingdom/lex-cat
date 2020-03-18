@@ -151,6 +151,36 @@ const fetchEntryMarkings = ({ state, commit }) => {
     commit('ENTRY_MARKINGS', {});
   }
 };
+const searchEntryMarkings = ({ state, commit }, payload) => {
+  const ref = db
+    .ref(`/dict/${state.theDomain}/entries/`)
+    .orderByChild('directForm')
+    .equalTo(payload);
+  ref.once('value', snap => {
+    const keys = Object.keys(snap.val()) || [];
+    const key = keys[0];
+    if (key) {
+      const worksetId = key
+        .split('-')
+        .slice(0, 2)
+        .join('-');
+      const superEntryId = key
+        .split('-')
+        .slice(0, 3)
+        .join('-');
+      db.ref(`/dict/${state.theDomain}/entryMarkings/${worksetId}`)
+        .orderByChild('entryId')
+        .startAt(superEntryId)
+        .endAt(`${superEntryId}\uf8ff`)
+        .once('value')
+        .then(msnap => {
+          commit('ENTRY_MARKINGS', msnap.val());
+        });
+    } else {
+      commit('ENTRY_MARKINGS', {});
+    }
+  });
+};
 
 const syncSummary = ({ state, commit }) => {
   const ref = db.ref(`/dict/${state.theDomain}/summary`);
@@ -202,7 +232,7 @@ const fetchSearchedSimilar = ({ state, commit }, string) => {
       .ref(`/dict/${state.theDomain}/entries`)
       .orderByChild('directForm')
       .startAt(directString)
-      .endAt(`${directString}\uf8ff")`);
+      .endAt(`${directString}\uf8ff`);
     ref.once('value').then(snap => {
       if (snap.exists()) {
         const theValue = snap.val();
@@ -638,6 +668,86 @@ const markFetchedSes = ({ commit }) => {
   commit('FETCHED_SES', true);
 };
 
+const addPoly = ({ state }) =>
+  new Promise(resolve => {
+    const {
+      description,
+      directForm,
+      domain,
+      entryId,
+      inverseForm,
+      orthForm,
+      sourcedFrom,
+    } = state.entry;
+    const isSkipped = false;
+    const needCheck = false;
+    const pos = '';
+    const sem = '';
+    const synOf = '';
+    const extraSyns = '';
+    const superEntryId = entryId
+      .split('-')
+      .slice(0, 3)
+      .join('-');
+    const worksetId = entryId
+      .split('-')
+      .slice(0, 2)
+      .join('-');
+
+    db.ref(`/dict/${state.theDomain}/entries`)
+      .orderByChild('entryId')
+      .startAt(superEntryId)
+      .endAt(`${superEntryId}\uf8ff`)
+      .once('value')
+      .then(snap => {
+        const senseNum = snap.numChildren() + 1;
+        const paddedNum = `${senseNum}`.padStart(2, '0');
+        const newEntryId = `${superEntryId}-${paddedNum}`;
+        const newEntry = {
+          description,
+          directForm,
+          domain,
+          entryId: newEntryId,
+          extraSyns,
+          inverseForm,
+          orthForm,
+          sourcedFrom,
+          isSkipped,
+          needCheck,
+          pos,
+          sem,
+          synOf,
+          senseNum,
+        };
+        db.ref(`/dict/${state.theDomain}/entries/${newEntryId}`).update(
+          newEntry,
+        );
+
+        const newEntryMarking = {
+          entryId: newEntryId,
+          orthForm,
+          worksetId,
+          stage: 0,
+          hasSynset: false,
+          hasExtraSyns: false,
+          issueProcess: 0,
+          senseNum,
+          notice: '',
+        };
+        db.ref(
+          `/dict/${state.theDomain}/entryMarkings/${worksetId}/${newEntryId}`,
+        ).update(newEntryMarking);
+      });
+    const worksetCntRef = db.ref(
+      `/dict/${state.theDomain}/worksets/${worksetId}/cntEntries`,
+    );
+    worksetCntRef.once('value').then(snap => {
+      const cntEntries = snap.val();
+      worksetCntRef.set(cntEntries + 1);
+    });
+    resolve();
+  });
+
 export {
   // common
   changeTheCurrentUser,
@@ -658,6 +768,7 @@ export {
   pickTheWorksetId,
   initEntryMarkings,
   fetchEntryMarkings,
+  searchEntryMarkings,
   pickTheEntryId,
   // entrywork
   fetchSimilars,
@@ -678,6 +789,7 @@ export {
   initEntry,
   pushIssue,
   onoffIssue,
+  addPoly,
   // ses
   checkSeSynset,
   fetchSeSynset,
