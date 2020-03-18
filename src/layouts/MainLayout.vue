@@ -99,12 +99,6 @@
             v-model="searchOrth"
             label="표제"
             v-show="userContext.role === 'supervisor'"
-          /><q-btn
-            dense
-            unelevated
-            label="검색"
-            type="submit"
-            color="primary"
           />
         </q-form>
         <q-list dense separator bordered class="bg-grey-1">
