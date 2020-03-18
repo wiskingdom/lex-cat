@@ -6,7 +6,9 @@ import MainLayout from '../layouts/MainLayout.vue';
 import MainAbout from '../views/MainAbout.vue';
 import MainEntry from '../views/MainEntry.vue';
 
-const IssueLayout = () => import('../layouts/IssueLayout.vue');
+const SesLayout = () => import('../layouts/SesLayout.vue');
+const Domain = () => import('../views/Domain.vue');
+const Synset = () => import('../views/Synset.vue');
 
 // const db = fireapp.database();
 const auth = fireapp.auth();
@@ -55,9 +57,35 @@ const routes = [
     ],
   },
   {
-    path: '/issue',
-    name: 'issue',
-    component: IssueLayout,
+    path: '/ses',
+    name: 'ses',
+    component: SesLayout,
+    beforeEnter: (to, from, next) => {
+      if (auth.currentUser) {
+        next();
+      } else {
+        next('/login');
+      }
+    },
+    children: [
+      {
+        path: ':domainId',
+        name: 'domain',
+        component: Domain,
+        children: [
+          {
+            path: 'about',
+            name: 'sesAbout',
+            component: MainAbout,
+          },
+          {
+            path: ':synsetId',
+            name: 'synset',
+            component: Synset,
+          },
+        ],
+      },
+    ],
   },
 ];
 

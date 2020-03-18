@@ -124,6 +124,18 @@ const THE_ISSUE_CODE = (state, payload) => {
 const ISSUE_MARKINGS = (state, payload) => {
   state.issueMarkings = payload;
 };
+const SE_SYNSET = (state, payload) => {
+  state.seSynset = payload;
+};
+const SE_SYNSET_MESSAGE = (state, payload) => {
+  state.seSynsetMessage = payload;
+};
+const MEMBERS = (state, payload) => {
+  state.members = payload;
+};
+const FETCHED_SES = (state, payload) => {
+  state.fetchedSes = payload;
+};
 
 export {
   THE_CURRENT_USER,
@@ -166,4 +178,8 @@ export {
   IS_CLOSED,
   ISSUE_MARKINGS,
   THE_ISSUE_CODE,
+  SE_SYNSET,
+  SE_SYNSET_MESSAGE,
+  MEMBERS,
+  FETCHED_SES,
 };

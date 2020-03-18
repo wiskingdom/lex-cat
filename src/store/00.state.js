@@ -62,7 +62,9 @@ export default {
     isClosed: false,
     messages: {},
   },
-  // issue tool
-  theIssueCode: '',
-  issueMarkings: {},
+  // ses (search & edit synset) tool
+  seSynset: '',
+  seSynsetMessage: '',
+  members: {},
+  fetchedSes: false,
 };

@@ -197,7 +197,7 @@ const fetchSimilars = ({ state, commit }) => {
 
 const fetchSearchedSimilar = ({ state, commit }, string) => {
   if (string.length > 1) {
-    const directString = string.toUpperCase().replace(/ -/g, '');
+    const directString = string.toUpperCase().replace(/[ -]/g, '');
     const ref = db
       .ref(`/dict/${state.theDomain}/entries`)
       .orderByChild('directForm')
@@ -291,21 +291,21 @@ const updateSynset = ({ state, commit }, mode) =>
         hasSynset: true,
       });
       const synIds = Object.keys(state.synset);
-      if (state.mergingSynsetId) {
+      if (state.entry.synOf) {
         synIds.forEach(entryId => {
           db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
-            synOf: state.mergingSynsetId,
+            synOf: state.entry.synOf,
           });
         });
-        commit('ENTRY_SYN_OF', state.mergingSynsetId);
         resolve();
       } else {
-        if (state.entry.synOf) {
+        if (state.mergingSynsetId) {
           synIds.forEach(entryId => {
             db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
-              synOf: state.entry.synOf,
+              synOf: state.mergingSynsetId,
             });
           });
+          commit('ENTRY_SYN_OF', state.mergingSynsetId);
           resolve();
         } else {
           const newSynsetId = db.ref(`/dict/${state.theDomain}/synsets`).push()
@@ -509,6 +509,135 @@ const updateExtraSyns = ({ state, commit }) =>
     resolve();
   });
 
+const checkSeSynset = ({ state, commit }, payload) =>
+  new Promise((resolve, reject) => {
+    db.ref(`/dict/${state.theDomain}/synsets/${payload}`)
+      .once('value')
+      .then(snap => {
+        if (snap.exists()) {
+          commit('SE_SYNSET', payload);
+          commit('SE_SYNSET_MESSAGE', '');
+          resolve(payload);
+        } else {
+          commit('SE_SYNSET_MESSAGE', 'no result');
+          reject();
+        }
+      });
+  });
+const fetchSeSynset = ({ state, commit }, payload) =>
+  new Promise(resolve => {
+    const ref = db.ref(`/dict/${state.theDomain}/synsets/${payload}`);
+    ref.once('value', snap => {
+      const synset = snap.val();
+      if (synset) {
+        commit('SYNSET', synset);
+        resolve();
+      } else {
+        let synset = {};
+        synset[state.entry.entryId] = state.entry.orthForm;
+        commit('SYNSET', synset);
+        resolve();
+      }
+    });
+  });
+const fetchMembers = ({ state, commit }) =>
+  new Promise(resolve => {
+    if (state.seSynset) {
+      const ref = db
+        .ref(`/dict/${state.theDomain}/entries`)
+        .orderByChild('synOf')
+        .equalTo(state.seSynset);
+      ref.once('value').then(snap => {
+        commit('MEMBERS', snap.val());
+        resolve();
+      });
+    } else {
+      commit('MEMBERS', {});
+      resolve();
+    }
+  });
+const selectMember = ({ state, commit }) =>
+  new Promise(resolve => {
+    commit('ENTRY', state.members[state.theEntryId]);
+    resolve();
+  });
+const updateMembers = ({ state }) =>
+  new Promise(resolve => {
+    const { isSkipped, needCheck, pos, sem } = state.entry;
+    Object.keys(state.members).forEach(entryId => {
+      db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
+        isSkipped,
+        needCheck,
+        pos,
+        sem,
+      });
+    });
+    resolve();
+  });
+const updateMembersStageCode = ({ state }, stage) =>
+  new Promise(resolve => {
+    const { pos, sem } = state.entry;
+    Object.keys(state.members).forEach(entryId => {
+      const worksetId = entryId
+        .split('-')
+        .slice(0, 2)
+        .join('-');
+      db.ref(
+        `/dict/${state.theDomain}/entryMarkings/${worksetId}/${entryId}`,
+      ).update({ stage });
+      const label = `${stage}-${pos}-${sem}`;
+      db.ref(`/dict/${state.theDomain}/lookup/${entryId}`).update({
+        label,
+      });
+      resolve();
+    });
+  });
+const unlinkMember = ({ state, commit }, memberKey) =>
+  new Promise(resolve => {
+    const worksetId = memberKey
+      .split('-')
+      .slice(0, 2)
+      .join('-');
+    const ref = db.ref(`/dict/${state.theDomain}/entries/${memberKey}`);
+    ref.update({ synOf: '' });
+    let synset = { ...state.synset };
+    delete synset[memberKey];
+    commit('SYNSET', synset);
+    db.ref(`/dict/${state.theDomain}/lookup/${memberKey}`).update({
+      hasSynset: false,
+    });
+    db.ref(
+      `/dict/${state.theDomain}/entryMarkings/${worksetId}/${memberKey}`,
+    ).update({ hasSynset: false });
+    resolve();
+  });
+
+const mergeMember = ({ state, commit }) =>
+  new Promise(resolve => {
+    commit('SYNSET', { ...state.synset, ...state.mergingSynset });
+    const synIds = Object.keys(state.synset);
+
+    synIds.forEach(entryId => {
+      const worksetId = entryId
+        .split('-')
+        .slice(0, 2)
+        .join('-');
+      db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
+        synOf: state.seSynset,
+      });
+      db.ref(`/dict/${state.theDomain}/lookup/${entryId}`).update({
+        hasSynset: true,
+      });
+      db.ref(
+        `/dict/${state.theDomain}/entryMarkings/${worksetId}/${entryId}`,
+      ).update({ hasSynset: true });
+    });
+    resolve();
+  });
+const markFetchedSes = ({ commit }) => {
+  commit('FETCHED_SES', true);
+};
+
 export {
   // common
   changeTheCurrentUser,
@@ -549,4 +678,14 @@ export {
   initEntry,
   pushIssue,
   onoffIssue,
+  // ses
+  checkSeSynset,
+  fetchSeSynset,
+  fetchMembers,
+  selectMember,
+  markFetchedSes,
+  updateMembers,
+  updateMembersStageCode,
+  unlinkMember,
+  mergeMember,
 };
