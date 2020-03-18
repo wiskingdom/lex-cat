@@ -388,7 +388,11 @@
           />
         </li>
       </ul>
-      <q-bar dense class="bg-grey-4 text-black text-bold">
+      <q-bar
+        dense
+        class="bg-grey-4 text-black text-bold"
+        v-show="userContext.role === 'supervisor'"
+      >
         <div>Poly</div>
         <q-space />
 
@@ -452,6 +456,7 @@ export default {
     ...mapState([
       'roles',
       'domainNames',
+      'userContext',
       'fetchedMain',
       'theDomain',
       'domainCodeMap',
