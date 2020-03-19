@@ -3,6 +3,18 @@ import fireapp from '@/fireapp';
 const db = fireapp.database();
 const auth = fireapp.auth();
 
+const getWorksetId = entryId =>
+  entryId
+    .split('-')
+    .slice(0, 2)
+    .join('-');
+
+const getSuperEntryId = entryId =>
+  entryId
+    .split('-')
+    .slice(0, 3)
+    .join('-');
+
 const changeTheCurrentUser = ({ commit }, payload) =>
   new Promise(resolve => {
     if (payload) {
@@ -160,14 +172,8 @@ const searchEntryMarkings = ({ state, commit }, payload) => {
     const keys = Object.keys(snap.val()) || [];
     const key = keys[0];
     if (key) {
-      const worksetId = key
-        .split('-')
-        .slice(0, 2)
-        .join('-');
-      const superEntryId = key
-        .split('-')
-        .slice(0, 3)
-        .join('-');
+      const worksetId = getWorksetId(key);
+      const superEntryId = getSuperEntryId(key);
       db.ref(`/dict/${state.theDomain}/entryMarkings/${worksetId}`)
         .orderByChild('entryId')
         .startAt(superEntryId)
@@ -407,14 +413,8 @@ const getIssueCode = role => issue => {
 const pushIssue = ({ state, commit }, { sender, text }) =>
   new Promise(resolve => {
     if (text.replace(/<.+?>/g, '').split('').length > 1) {
-      const {
-        theDomain,
-        theWorksetId,
-        theEntryId,
-        issue,
-        roles,
-        entry,
-      } = state;
+      const { theDomain, theEntryId, issue, roles, entry } = state;
+      const worksetId = getWorksetId(theEntryId);
       const { orthForm } = entry;
       const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}/messages`);
       const newKey = ref.push().key;
@@ -424,7 +424,7 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
 
       commit('ISSUE_CODE', issueProcess);
       db.ref(
-        `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+        `/dict/${theDomain}/entryMarkings/${worksetId}/${theEntryId}`,
       ).update({ issueProcess });
       db.ref(`/dict/${theDomain}/issues/${theEntryId}`).update({
         issueProcess,
@@ -435,7 +435,8 @@ const pushIssue = ({ state, commit }, { sender, text }) =>
   });
 const onoffIssue = ({ state, commit }, isClosed) =>
   new Promise(resolve => {
-    const { theDomain, theWorksetId, theEntryId, issue, roles, entry } = state;
+    const { theDomain, theEntryId, issue, roles, entry } = state;
+    const worksetId = getWorksetId(theEntryId);
     const { orthForm } = entry;
     if (Object.values(issue.messages > 0)) {
       const ref = db.ref(`/dict/${theDomain}/issues/${theEntryId}`);
@@ -444,7 +445,7 @@ const onoffIssue = ({ state, commit }, isClosed) =>
       const issueProcess = getIssueCode(roles.supervisor)(issue);
 
       db.ref(
-        `/dict/${theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+        `/dict/${theDomain}/entryMarkings/${worksetId}/${theEntryId}`,
       ).update({ issueProcess });
       db.ref(`/dict/${theDomain}/issues/${theEntryId}`).update({
         issueProcess,
@@ -509,11 +510,12 @@ const updateEntry = ({ state, getters }) =>
   });
 const updateStageCode = ({ state, commit }, stage) =>
   new Promise(resolve => {
-    const { theWorksetId, theEntryId, entry } = state;
+    const { theEntryId, entry } = state;
+    const worksetId = getWorksetId(theEntryId);
     const { pos, sem } = entry;
     commit('STAGE_CODE', stage);
     db.ref(
-      `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+      `/dict/${state.theDomain}/entryMarkings/${worksetId}/${theEntryId}`,
     ).update({ stage });
     const label = `${stage}-${pos}-${sem}`;
     db.ref(`/dict/${state.theDomain}/lookup/${state.theEntryId}`).update({
@@ -523,12 +525,13 @@ const updateStageCode = ({ state, commit }, stage) =>
   });
 const updateExtraSyns = ({ state, commit }) =>
   new Promise(resolve => {
-    const { theWorksetId, theEntryId, entry } = state;
+    const { theEntryId, entry } = state;
+    const worksetId = getWorksetId(theEntryId);
     const { extraSyns } = entry;
     const hasExtraSyns = !!(Object.keys(extraSyns) || []).length;
     commit('HAS_EXTRA_SYNS', hasExtraSyns);
     db.ref(
-      `/dict/${state.theDomain}/entryMarkings/${theWorksetId}/${theEntryId}`,
+      `/dict/${state.theDomain}/entryMarkings/${worksetId}/${theEntryId}`,
     ).update({ hasExtraSyns });
     db.ref(`/dict/${state.theDomain}/lookup/${theEntryId}`).update({
       hasExtraSyns,
@@ -608,10 +611,8 @@ const updateMembersStageCode = ({ state }, stage) =>
   new Promise(resolve => {
     const { pos, sem } = state.entry;
     Object.keys(state.members).forEach(entryId => {
-      const worksetId = entryId
-        .split('-')
-        .slice(0, 2)
-        .join('-');
+      const worksetId = getWorksetId(entryId);
+
       db.ref(
         `/dict/${state.theDomain}/entryMarkings/${worksetId}/${entryId}`,
       ).update({ stage });
@@ -624,10 +625,7 @@ const updateMembersStageCode = ({ state }, stage) =>
   });
 const unlinkMember = ({ state, commit }, memberKey) =>
   new Promise(resolve => {
-    const worksetId = memberKey
-      .split('-')
-      .slice(0, 2)
-      .join('-');
+    const worksetId = getWorksetId(memberKey);
     const ref = db.ref(`/dict/${state.theDomain}/entries/${memberKey}`);
     ref.update({ synOf: '' });
     let synset = { ...state.synset };
@@ -648,10 +646,8 @@ const mergeMember = ({ state, commit }) =>
     const synIds = Object.keys(state.synset);
 
     synIds.forEach(entryId => {
-      const worksetId = entryId
-        .split('-')
-        .slice(0, 2)
-        .join('-');
+      const worksetId = getWorksetId(entryId);
+
       db.ref(`/dict/${state.theDomain}/entries/${entryId}`).update({
         synOf: state.seSynset,
       });
@@ -678,21 +674,15 @@ const addPoly = ({ state }) =>
       inverseForm,
       orthForm,
       sourcedFrom,
+      pos,
     } = state.entry;
     const isSkipped = false;
     const needCheck = false;
-    const pos = '';
     const sem = '';
     const synOf = '';
     const extraSyns = '';
-    const superEntryId = entryId
-      .split('-')
-      .slice(0, 3)
-      .join('-');
-    const worksetId = entryId
-      .split('-')
-      .slice(0, 2)
-      .join('-');
+    const superEntryId = getSuperEntryId(entryId);
+    const worksetId = getWorksetId(entryId);
 
     db.ref(`/dict/${state.theDomain}/entries`)
       .orderByChild('entryId')
