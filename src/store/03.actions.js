@@ -233,12 +233,20 @@ const fetchSimilars = ({ state, commit }) => {
 
 const fetchSearchedSimilar = ({ state, commit }, string) => {
   if (string.length > 1) {
-    const directString = string.toUpperCase().replace(/[ -]/g, '');
+    const mode = string.endsWith('$') ? 'inverseForm' : 'directForm';
+    const searchString = string.endsWith('$')
+      ? string
+          .split('')
+          .reverse()
+          .slice(1)
+          .join('')
+      : string;
+    const term = searchString.toUpperCase().replace(/[ -]/g, '');
     const ref = db
       .ref(`/dict/${state.theDomain}/entries`)
-      .orderByChild('directForm')
-      .startAt(directString)
-      .endAt(`${directString}\uf8ff`);
+      .orderByChild(mode)
+      .startAt(term)
+      .endAt(`${term}\uf8ff`);
     ref.once('value').then(snap => {
       if (snap.exists()) {
         const theValue = snap.val();
