@@ -633,7 +633,7 @@ export default {
       }
     },
     addPolyItem() {
-      this.addPoly().then(this.fetchEntryMarkings);
+      this.addPoly();
     },
     fetch() {
       const { entryId } = this.$route.params;

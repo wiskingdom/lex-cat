@@ -31,74 +31,82 @@ const entryIndex = state => {
   if (!state.entryMarkings) {
     return [];
   }
-  return Object.entries(state.entryMarkings).map(([value, features]) => {
-    const { hasSynset, issueProcess, stage, orthForm, hasExtraSyns } = features;
-    const senseNum = features.senseNum || 1;
-    const label = orthForm;
-    const getStageText = stageCode => {
-      if (stageCode === 0) {
-        return '대기';
-      } else if (stageCode === 3) {
-        return '등재';
-      } else if (stageCode === 2) {
-        return '미등재';
-      } else {
-        return '보류';
-      }
-    };
-    const getStageColor = stageCode => {
-      if (stageCode === 0) {
-        return 'grey-5';
-      } else if (stageCode === 3) {
-        return 'positive';
-      } else if (stageCode === 2) {
-        return 'dark';
-      } else {
-        return 'warning';
-      }
-    };
-    const getIssueText = issueCode => {
-      if (issueCode === 0) {
-        return '';
-      } else if (issueCode === 1) {
-        return '신고';
-      } else if (issueCode === 2) {
-        return '요청';
-      } else {
-        return '닫음';
-      }
-    };
-    const getIssueColor = issueCode => {
-      if (issueCode === 0) {
-        return '';
-      } else if (issueCode === 1) {
-        return 'deep-orange-8';
-      } else if (issueCode === 2) {
-        return 'indigo-8';
-      } else {
-        return 'grey-8';
-      }
-    };
-    const getHasSynsetText = bool => (bool ? 'syn' : '');
-    const getHasExtraSynsText = bool => (bool ? 'exSyn' : '');
-    const stageText = getStageText(stage);
-    const stageColor = getStageColor(stage);
-    const hasSynsetText = getHasSynsetText(hasSynset);
-    const hasExtraSynsText = getHasExtraSynsText(hasExtraSyns);
-    const issueText = getIssueText(issueProcess);
-    const issueColor = getIssueColor(issueProcess);
-    return {
-      label,
-      value,
-      stageColor,
-      stageText,
-      hasSynsetText,
-      hasExtraSynsText,
-      issueText,
-      issueColor,
-      senseNum,
-    };
-  });
+  return Object.entries(state.entryMarkings)
+    .sort()
+    .map(([value, features]) => {
+      const {
+        hasSynset,
+        issueProcess,
+        stage,
+        orthForm,
+        hasExtraSyns,
+      } = features;
+      const senseNum = features.senseNum || 1;
+      const label = orthForm;
+      const getStageText = stageCode => {
+        if (stageCode === 0) {
+          return '대기';
+        } else if (stageCode === 3) {
+          return '등재';
+        } else if (stageCode === 2) {
+          return '미등재';
+        } else {
+          return '보류';
+        }
+      };
+      const getStageColor = stageCode => {
+        if (stageCode === 0) {
+          return 'grey-5';
+        } else if (stageCode === 3) {
+          return 'positive';
+        } else if (stageCode === 2) {
+          return 'dark';
+        } else {
+          return 'warning';
+        }
+      };
+      const getIssueText = issueCode => {
+        if (issueCode === 0) {
+          return '';
+        } else if (issueCode === 1) {
+          return '신고';
+        } else if (issueCode === 2) {
+          return '요청';
+        } else {
+          return '닫음';
+        }
+      };
+      const getIssueColor = issueCode => {
+        if (issueCode === 0) {
+          return '';
+        } else if (issueCode === 1) {
+          return 'deep-orange-8';
+        } else if (issueCode === 2) {
+          return 'indigo-8';
+        } else {
+          return 'grey-8';
+        }
+      };
+      const getHasSynsetText = bool => (bool ? 'syn' : '');
+      const getHasExtraSynsText = bool => (bool ? 'exSyn' : '');
+      const stageText = getStageText(stage);
+      const stageColor = getStageColor(stage);
+      const hasSynsetText = getHasSynsetText(hasSynset);
+      const hasExtraSynsText = getHasExtraSynsText(hasExtraSyns);
+      const issueText = getIssueText(issueProcess);
+      const issueColor = getIssueColor(issueProcess);
+      return {
+        label,
+        value,
+        stageColor,
+        stageText,
+        hasSynsetText,
+        hasExtraSynsText,
+        issueText,
+        issueColor,
+        senseNum,
+      };
+    });
 };
 
 const theSuperNum = state => state.theEntryId.split('-').slice(2, 3)[0];

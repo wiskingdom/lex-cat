@@ -672,7 +672,7 @@ const markFetchedSes = ({ commit }) => {
   commit('FETCHED_SES', true);
 };
 
-const addPoly = ({ state }) =>
+const addPoly = ({ state, commit }) =>
   new Promise(resolve => {
     const {
       description,
@@ -735,6 +735,12 @@ const addPoly = ({ state }) =>
         db.ref(
           `/dict/${state.theDomain}/entryMarkings/${worksetId}/${newEntryId}`,
         ).update(newEntryMarking);
+        const newEntryMarkings = {};
+        newEntryMarkings[newEntryId] = newEntryMarking;
+        commit('ENTRY_MARKINGS', {
+          ...state.entryMarkings,
+          ...newEntryMarkings,
+        });
       });
     const worksetCntRef = db.ref(
       `/dict/${state.theDomain}/worksets/${worksetId}/cntEntries`,
