@@ -169,7 +169,8 @@ const searchEntryMarkings = ({ state, commit }, payload) => {
     .orderByChild('directForm')
     .equalTo(payload);
   ref.once('value', snap => {
-    const keys = Object.keys(snap.val()) || [];
+    const value = snap.val();
+    const keys = value ? Object.keys(value) : [];
     const key = keys[0];
     if (key) {
       const worksetId = getWorksetId(key);
